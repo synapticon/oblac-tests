@@ -51,8 +51,15 @@ export class MotionMasterApi {
     return res.json() as Promise<T>
   }
 
-  connect(): Promise<unknown> {
-    return this.get('/connect')
+  async connect(): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/connect`, {
+      headers: { Accept: 'application/json' },
+    })
+    // 409 means already connected — that's fine
+    if (!res.ok && res.status !== 409) {
+      const body = await res.text()
+      throw new Error(`GET /connect → ${res.status}: ${body}`)
+    }
   }
 
   getVersion(): Promise<ClientVersion> {
