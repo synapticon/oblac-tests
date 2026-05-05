@@ -2,13 +2,13 @@ import { test, expect } from 'vitest';
 import { api } from '../src/setup.js';
 
 test('client library version', async () => {
-  const { version } = await api.getVersion();
-  console.log('motion-master-client version:', version);
-  expect(version).toMatch(/^\d+\.\d+\.\d+/);
+  const { data } = await api.version.getVersion();
+  console.log('motion-master-client version:', data.version);
+  expect(data.version).toMatch(/^\d+\.\d+\.\d+/);
 });
 
 test('system version', async () => {
-  const systemVersion = await api.getSystemVersion();
-  console.log('system version:', JSON.stringify(systemVersion, null, 2));
-  expect(systemVersion.version).toBeTruthy();
+  const { data } = await api.systemVersion.getSystemVersion();
+  console.log('system version:', JSON.stringify(data, null, 2));
+  expect(data.version).toBeTruthy();
 });

@@ -1,7 +1,9 @@
 import { execSync, spawnSync } from 'child_process';
+import { Api } from './mm-api.js';
 
 const port = process.env.MM_API_PORT ?? '63526';
 const apiBase = `http://localhost:${port}/api`;
+const api = new Api({ baseUrl: apiBase });
 
 async function waitForApi(timeoutMs = 60_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
@@ -20,15 +22,12 @@ async function connectToMotionMaster(timeoutMs = 120_000): Promise<void> {
   console.log('Connecting to Motion Master...');
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(`${apiBase}/connect`);
-      if (res.ok || res.status === 409) {
-        console.log('Connected to Motion Master');
-        return;
-      }
-      const body = await res.text();
-      console.log(`  waiting (${res.status}: ${body})`);
-    } catch (e) {
-      console.log(`  waiting (${e})`);
+      const res = await api.connect.connect();
+      console.log('Connected to Motion Master', res);
+      return;
+    } catch (e: any) {
+      if (e?.status === 409) { return; }
+      console.log(`  waiting (${e?.error?.message ?? e})`);
     }
     await new Promise(r => setTimeout(r, 2_000));
   }
