@@ -7,6 +7,7 @@ export default defineConfig({
     timeout: 60_000,
     hookTimeout: 120_000,
     teardownTimeout: 30_000,
+    globalSetup: './src/global-setup.ts',
     reporters: ['verbose'],
     // Run tests sequentially — only one device attached
     pool: 'forks',

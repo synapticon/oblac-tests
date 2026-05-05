@@ -38,23 +38,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Start services
+      - name: Run tests
         env:
+          CI: 'true'
           MM_VERSION: ${{ inputs.mm_version }}
           MM_API_VERSION: ${{ inputs.mm_api_version }}
           MM_MAC: ${{ inputs.mm_mac }}
-        run: docker compose up -d
-
-      - name: Wait for Motion Master API
-        run: |
-          echo "Waiting for Motion Master API..."
-          timeout 120 bash -c 'until curl -sf http://localhost:63526/ > /dev/null 2>&1; do sleep 2; done'
-          echo "API is ready"
-
-      - name: Run tests
-        env:
-          MM_VERSION: ${{ inputs.mm_version }}
-          MM_API_VERSION: ${{ inputs.mm_api_version }}
         run: |
           if [ -n "${{ inputs.test_filter }}" ]; then
             npx vitest run ${{ inputs.test_filter }}
@@ -67,10 +56,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: |
-            test-results/
+          path: test-results/
           if-no-files-found: ignore
-
-      - name: Stop services
-        if: always()
-        run: docker compose down
