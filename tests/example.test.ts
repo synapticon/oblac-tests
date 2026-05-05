@@ -9,6 +9,16 @@ test('client library version', async () => {
 
 test('system version', async () => {
   const { data } = await api.systemVersion.getSystemVersion();
-  console.log('system version:', JSON.stringify(data, null, 2));
+  console.log(`system version: ${data.version}`);
   expect(data.version).toBeTruthy();
+});
+
+test('devices', async () => {
+  const { data } = await api.devices.getDevices();
+  console.log(`devices found: ${data.length}`);
+  for (const device of data) {
+    console.log(`position: ${device.position}, serial: ${device.hardwareDescription?.device?.serialNumber}`);
+  }
+  expect(Array.isArray(data)).toBe(true);
+  expect(data.length).toBeGreaterThan(0);
 });
