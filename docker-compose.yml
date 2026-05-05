@@ -1,0 +1,24 @@
+services:
+  motion-master:
+    image: synapticon/motion-master:${MM_VERSION:-v5.4.1-flatbot.12}
+    container_name: motion-master
+    network_mode: host
+    privileged: true
+    environment:
+      MM_DRV: "${MM_DRV:-soem}"
+      MM_MAC: "${MM_MAC}"
+      MM_REQ_RES_PORT: "${MM_REQ_RES_PORT:-63524}"
+      MM_PUB_SUB_PORT: "${MM_PUB_SUB_PORT:-63525}"
+      MM_IPS: "${MM_IPS:-}"
+      MM_PDO_MODE: "${MM_PDO_MODE:-monitor}"
+    restart: unless-stopped
+
+  motion-master-api:
+    image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.382}
+    container_name: motion-master-api
+    network_mode: host
+    depends_on:
+      - motion-master
+    environment:
+      PORT: "${MM_API_PORT:-63526}"
+    restart: unless-stopped

@@ -1,0 +1,76 @@
+name: Motion Master Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      mm_version:
+        description: 'Motion Master image tag (e.g. v5.4.1-flatbot.12)'
+        default: 'v5.4.1-flatbot.12'
+        required: false
+      mm_api_version:
+        description: 'Motion Master API image tag (e.g. v0.0.382)'
+        default: 'v0.0.382'
+        required: false
+      mm_mac:
+        description: 'EtherCAT interface MAC address'
+        required: true
+      test_filter:
+        description: 'Test file/pattern to run (empty = all tests)'
+        default: ''
+        required: false
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: [self-hosted, L7430]
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start services
+        env:
+          MM_VERSION: ${{ inputs.mm_version }}
+          MM_API_VERSION: ${{ inputs.mm_api_version }}
+          MM_MAC: ${{ inputs.mm_mac }}
+        run: docker compose up -d
+
+      - name: Wait for Motion Master API
+        run: |
+          echo "Waiting for Motion Master API..."
+          timeout 120 bash -c 'until curl -sf http://localhost:63526/ > /dev/null 2>&1; do sleep 2; done'
+          echo "API is ready"
+
+      - name: Run tests
+        env:
+          MM_VERSION: ${{ inputs.mm_version }}
+          MM_API_VERSION: ${{ inputs.mm_api_version }}
+        run: |
+          if [ -n "${{ inputs.test_filter }}" ]; then
+            npx vitest run ${{ inputs.test_filter }}
+          else
+            npx vitest run
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results/
+          if-no-files-found: ignore
+
+      - name: Stop services
+        if: always()
+        run: docker compose down
