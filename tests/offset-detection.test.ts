@@ -1,4 +1,4 @@
-import { test, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, expect, test } from 'vitest';
 import { api, psu } from '../src/setup.js';
 
 beforeAll(() => psu.on());
@@ -24,6 +24,6 @@ test('run-offset-detection', async () => {
     }
   }
 
-  const failed = steps.filter(s => s.status === 'failed');
-  expect(failed, `failed steps: ${failed.map(s => s.label).join(', ')}`).toHaveLength(0);
+  const failed = steps.filter((s) => s.status === 'failed');
+  expect(failed, `failed steps: ${failed.map((s) => s.label).join(', ')}`).toHaveLength(0);
 }, 300_000);

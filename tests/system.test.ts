@@ -1,4 +1,4 @@
-import { test, expect } from 'vitest';
+import { expect, test } from 'vitest';
 import { api } from '../src/setup.js';
 
 test('client library version', async () => {

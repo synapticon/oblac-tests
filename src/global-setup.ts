@@ -1,7 +1,7 @@
 // Vitest global setup — runs once before the entire test suite, then teardown once after.
 // Sequence: start Docker services → wait for MM API HTTP → connect MM to EtherCAT bus.
 
-import { execSync, spawnSync } from 'child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { Api } from './mm-api.js';
 
 const port = process.env.MM_API_PORT ?? '63526';
@@ -14,9 +14,11 @@ async function waitForApi(timeoutMs = 60_000): Promise<void> {
   while (Date.now() < deadline) {
     try {
       const res = await fetch(`${apiBase}/version`);
-      if (res.ok) { return; }
-    } catch { }
-    await new Promise(r => setTimeout(r, 1_000));
+      if (res.ok) {
+        return;
+      }
+    } catch {}
+    await new Promise((r) => setTimeout(r, 1_000));
   }
   throw new Error(`Motion Master API not ready after ${timeoutMs}ms`);
 }
@@ -32,11 +34,14 @@ async function connectToMotionMaster(timeoutMs = 120_000): Promise<void> {
       const res = await api.connect.connect();
       console.log('Connected to Motion Master', res);
       return;
-    } catch (e: any) {
-      if (e?.status === 409) { return; }
-      console.log(`  waiting (${e?.error?.message ?? e})`);
+    } catch (e) {
+      const err = e as { status?: number; error?: { message?: string } };
+      if (err?.status === 409) {
+        return;
+      }
+      console.log(`  waiting (${err?.error?.message ?? e})`);
     }
-    await new Promise(r => setTimeout(r, 2_000));
+    await new Promise((r) => setTimeout(r, 2_000));
   }
   throw new Error(`Could not connect to Motion Master after ${timeoutMs}ms`);
 }
@@ -47,7 +52,9 @@ export async function setup() {
   try {
     execSync('docker compose up -d', { stdio: 'inherit' });
   } catch {
-    spawnSync('docker', ['rm', '-f', 'motion-master', 'motion-master-api'], { stdio: 'inherit' });
+    spawnSync('docker', ['rm', '-f', 'motion-master', 'motion-master-api'], {
+      stdio: 'inherit',
+    });
     execSync('docker compose up -d', { stdio: 'inherit' });
   }
   await waitForApi();

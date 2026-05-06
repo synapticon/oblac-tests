@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -8,10 +8,7 @@ export default defineConfig({
     hookTimeout: 120_000,
     teardownTimeout: 30_000,
     globalSetup: './src/global-setup.ts',
-    include: [
-      'tests/system.test.ts',
-      'tests/offset-detection.test.ts',
-    ],
+    include: ['tests/system.test.ts', 'tests/offset-detection.test.ts'],
     reporters: ['verbose'],
     // Run tests sequentially — only one device attached
     pool: 'forks',
@@ -23,4 +20,4 @@ export default defineConfig({
       MM_API_URL: `http://localhost:${process.env.MM_API_PORT ?? '63526'}/api`,
     },
   },
-})
+});
