@@ -5,7 +5,7 @@ beforeAll(() => psu.on());
 afterAll(() => psu.off());
 
 test('run-offset-detection', async () => {
-  const { data: devices } = await api.devices.getDevices();
+  const { data: devices } = await api.devices.getDevices({ 'request-timeout': 20_000 });
   if (devices.length === 0) {
     throw new Error('No devices found — cannot run offset detection');
   }
