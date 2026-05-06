@@ -1,5 +1,8 @@
-import { test, expect } from 'vitest';
-import { api } from '../src/setup.js';
+import { test, expect, beforeAll, afterAll } from 'vitest';
+import { api, psu } from '../src/setup.js';
+
+beforeAll(() => psu.on());
+afterAll(() => psu.off());
 
 test('run-offset-detection', async () => {
   const { data: devices } = await api.devices.getDevices();
