@@ -1,13 +1,14 @@
 ---
 - name: Install and configure system packages
   hosts: local
-  become: true
+  become: false
   roles:
     - test-machine
 
 - name: Set up test environment
   hosts: local
-  become: false
+  become: true
+  become_user: "{{ username }}"
   tasks:
     - name: Determine repository root
       ansible.builtin.set_fact:

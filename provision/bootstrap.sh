@@ -35,12 +35,8 @@ fi
 
 # --- Run playbook ---
 
-read -r -s -p "BECOME password (sudo): " ANSIBLE_BECOME_PASS
-echo
-export ANSIBLE_BECOME_PASS
-
 cd "$CLONE_DIR/provision/ansible"
 echo ""
 echo "[bootstrap] Running Ansible playbook ..."
 echo ""
-ansible-playbook site.yml
+sudo -E ansible-playbook site.yml -e "target_user=$USER" -e "target_home=$HOME"
