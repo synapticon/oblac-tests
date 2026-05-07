@@ -1,0 +1,20 @@
+---
+packages:
+  # essentials
+  - git
+  - curl
+  - wget
+  - jq
+  - htop
+  - tree
+  - net-tools
+  - ca-certificates
+  - gnupg
+
+  # Python
+  - python3
+  - python3-pip
+  - python3-venv
+
+  # build tools (required by some native npm packages)
+  - build-essential

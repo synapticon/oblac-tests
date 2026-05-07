@@ -1,0 +1,31 @@
+---
+- name: Install and configure system packages
+  hosts: local
+  become: true
+  roles:
+    - test-machine
+
+- name: Set up test environment
+  hosts: local
+  become: false
+  tasks:
+    - name: Determine repository root
+      ansible.builtin.set_fact:
+        repo_dir: "{{ playbook_dir | dirname | dirname }}"
+
+    - name: Install npm dependencies
+      ansible.builtin.command:
+        cmd: npm install
+        chdir: "{{ repo_dir }}"
+        creates: "{{ repo_dir }}/node_modules"
+
+    - name: Create .env from example
+      ansible.builtin.copy:
+        src: "{{ repo_dir }}/.env.example"
+        dest: "{{ repo_dir }}/.env"
+        remote_src: true
+        force: false
+
+    - name: Remind to configure .env
+      ansible.builtin.debug:
+        msg: "Edit {{ repo_dir }}/.env and set MM_MAC to the EtherCAT interface MAC address before running tests."

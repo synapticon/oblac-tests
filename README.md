@@ -11,6 +11,22 @@ Tests run against a real device connected via EtherCAT. Motion Master and its HT
 - A SOMANET device reachable via EtherCAT
 - *(optional)* A P1535 PSU controller on the local network
 
+## Provisioning a test machine
+
+To provision a fresh Ubuntu 26.04 machine with Docker, Node.js, Python, and all required tools:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh | bash
+```
+
+This installs all dependencies, clones the repository, runs `npm install`, and creates `.env` from `.env.example`. After it completes, set `MM_MAC` in `.env` and run the tests.
+
+To re-provision an existing machine:
+
+```bash
+./provision/play.sh
+```
+
 ## Setup
 
 ```bash
