@@ -21,11 +21,7 @@ fi
 echo "[bootstrap] Installing git and ansible ..."
 sudo apt-get update -qq
 command -v git &>/dev/null || sudo apt-get install -y git
-if ! command -v ansible-playbook &>/dev/null; then
-    command -v pipx &>/dev/null || sudo apt-get install -y pipx
-    pipx install ansible
-    export PATH="$PATH:$HOME/.local/bin"
-fi
+command -v ansible-playbook &>/dev/null || sudo apt-get install -y ansible
 
 # --- Clone repo ---
 
