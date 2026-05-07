@@ -13,6 +13,18 @@
       ansible.builtin.set_fact:
         repo_dir: "{{ playbook_dir | dirname | dirname }}"
 
+    - name: Configure git user name
+      community.general.git_config:
+        name: user.name
+        scope: global
+        value: Marko Sanković
+
+    - name: Configure git user email
+      community.general.git_config:
+        name: user.email
+        scope: global
+        value: msankovic@synapticon.com
+
     - name: Install npm dependencies
       ansible.builtin.command:
         cmd: npm install

@@ -9,7 +9,6 @@ packages:
   - tree
   - net-tools
   - ca-certificates
-  - gnupg
 
   # Python
   - python3
@@ -18,3 +17,15 @@ packages:
 
   # build tools (required by some native npm packages)
   - build-essential
+
+  # dev tooling
+  - gh
+  - lazygit
+
+  # Docker
+  - docker.io
+  - docker-compose-v2
+  - docker-buildx
+
+  # Node.js (the nodejs package bundles npm)
+  - nodejs

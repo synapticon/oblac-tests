@@ -1,39 +1,7 @@
 ---
 - name: Install system packages
-  ansible.builtin.package:
-    name: "{{ packages }}"
-    state: present
-
-- name: Create APT keyrings directory
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    mode: "0755"
-
-- name: Add Docker GPG key
-  ansible.builtin.shell: >
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
-    gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-  args:
-    creates: /etc/apt/keyrings/docker.gpg
-
-- name: Add Docker apt repository
-  ansible.builtin.shell: |
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-    https://download.docker.com/linux/ubuntu \
-    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-    tee /etc/apt/sources.list.d/docker.list > /dev/null
-  args:
-    creates: /etc/apt/sources.list.d/docker.list
-
-- name: Install Docker
   ansible.builtin.apt:
-    name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
+    name: "{{ packages }}"
     state: present
     update_cache: true
 
@@ -42,44 +10,3 @@
     name: "{{ username }}"
     groups: docker
     append: true
-
-- name: Add NodeSource GPG key
-  ansible.builtin.shell: >
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key |
-    gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-  args:
-    creates: /etc/apt/keyrings/nodesource.gpg
-
-- name: Add NodeSource apt repository
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main"
-    state: present
-    filename: nodesource
-
-- name: Install Node.js
-  ansible.builtin.apt:
-    name: nodejs
-    state: present
-    update_cache: true
-
-- name: Add GitHub CLI GPG key
-  ansible.builtin.shell: |
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
-    dd of=/etc/apt/keyrings/githubcli-archive-keyring.gpg && \
-    chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-  args:
-    creates: /etc/apt/keyrings/githubcli-archive-keyring.gpg
-
-- name: Add GitHub CLI apt repository
-  ansible.builtin.shell: |
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] \
-    https://cli.github.com/packages stable main" | \
-    tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-  args:
-    creates: /etc/apt/sources.list.d/github-cli.list
-
-- name: Install GitHub CLI
-  ansible.builtin.apt:
-    name: gh
-    state: present
-    update_cache: true

@@ -7,19 +7,19 @@ Tests run against a real device connected via EtherCAT. Motion Master and its HT
 ## Requirements
 
 - Docker (with Compose v2)
-- Node.js ≥ 20
+- Node.js ≥ 22
 - A SOMANET device reachable via EtherCAT
 - *(optional)* A P1535 PSU controller on the local network
 
 ## Provisioning a test machine
 
-To provision a fresh Ubuntu 26.04 machine with Docker, Node.js, Python, and all required tools:
+The target platform is **Ubuntu 26.04 LTS**. To provision a fresh machine:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh)
 ```
 
-This installs all dependencies, clones the repository, runs `npm install`, and creates `.env` from `.env.example`. After it completes, set `MM_MAC` in `.env` and run the tests.
+This installs all dependencies from Ubuntu's apt repositories (Docker, Node.js, Python, build tools, `gh`, `lazygit`), clones the repository, runs `npm install`, and creates `.env` from `.env.example`. After it completes, set `MM_MAC` in `.env` and run the tests.
 
 To re-provision an existing machine:
 

@@ -53,12 +53,11 @@ clone_repo() {
 # --- Run playbook ---
 
 run_playbook() {
-    cd "$CLONE_DIR/provision/ansible"
     echo ""
     echo "[bootstrap] Running Ansible playbook ..."
     echo "You will be prompted for your sudo password."
     echo ""
-    ansible-playbook site.yml --ask-become-pass
+    "$CLONE_DIR/provision/play.sh"
 }
 
 install_deps
