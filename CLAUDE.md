@@ -12,7 +12,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
 - **`tests/`** — Vitest test files; all tests run sequentially (single device attached)
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
 - **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. Two roles:
-  - `test-machine` — installs system packages from `roles/test-machine/vars/main.yml` (Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`), VS Code via snap, configures git for Marko, and adds the user to `docker`.
+  - `test-machine` — installs system packages from `roles/test-machine/vars/main.yml` (Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`), VS Code via snap, configures git for Marko, adds the user to `docker`, and installs `psu-on`/`psu-off` PSU control scripts to `~/.local/bin`.
   - `actions-runner` — registers the machine as a self-hosted GitHub Actions runner for `synapticon/oblac-tests` and installs the runner as a systemd service. Idempotent (skips if `~/actions-runner/.runner` exists). Requires `gh auth login` first; fetches the registration token at runtime via `gh api`.
 - **`docker-compose.yml`** — runs `synapticon/motion-master` and `synapticon/motion-master-api` containers
 - **`.github/workflows/test.yml`** — `workflow_dispatch`-only CI; targets `runs-on: [self-hosted, OptiPlex-3080]` (the test machine's hostname-derived label)

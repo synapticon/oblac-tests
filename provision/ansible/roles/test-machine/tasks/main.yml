@@ -15,3 +15,22 @@
     name: "{{ username }}"
     groups: docker
     append: true
+
+- name: Ensure ~/.local/bin exists
+  ansible.builtin.file:
+    path: "{{ home_dir }}/.local/bin"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: '0755'
+
+- name: Install PSU control scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ home_dir }}/.local/bin/{{ item }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: '0755'
+  loop:
+    - psu-on
+    - psu-off
