@@ -16,7 +16,7 @@ Tests run against a real device connected via EtherCAT. Motion Master and its HT
 To provision a fresh Ubuntu 26.04 machine with Docker, Node.js, Python, and all required tools:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh | bash
+bash <(curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh)
 ```
 
 This installs all dependencies, clones the repository, runs `npm install`, and creates `.env` from `.env.example`. After it completes, set `MM_MAC` in `.env` and run the tests.

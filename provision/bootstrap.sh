@@ -35,9 +35,12 @@ fi
 
 # --- Run playbook ---
 
+read -r -s -p "BECOME password (sudo): " ANSIBLE_BECOME_PASS
+echo
+export ANSIBLE_BECOME_PASS
+
 cd "$CLONE_DIR/provision/ansible"
 echo ""
 echo "[bootstrap] Running Ansible playbook ..."
-echo "You will be prompted for your sudo password."
 echo ""
-ansible-playbook site.yml --ask-become-pass
+ansible-playbook site.yml
