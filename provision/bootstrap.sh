@@ -6,37 +6,61 @@ CLONE_DIR="$HOME/github/synapticon/oblac-tests"
 
 # --- OS detection ---
 
-if [ -f /etc/os-release ]; then
-    # shellcheck source=/dev/null
-    . /etc/os-release
-fi
+detect_os_family() {
+    if [ -f /etc/os-release ]; then
+        # shellcheck source=/dev/null
+        . /etc/os-release
+        echo "${ID_LIKE:-$ID}"
+    else
+        echo "unknown"
+    fi
+}
 
-if ! echo "${ID_LIKE:-${ID:-}}" | grep -qiE "debian|ubuntu"; then
-    echo "[bootstrap] This script requires Ubuntu/Debian."
-    exit 1
-fi
+OS_FAMILY=$(detect_os_family)
 
 # --- Install git + ansible ---
 
-echo "[bootstrap] Installing git and ansible ..."
-sudo apt-get update -qq
-command -v git &>/dev/null || sudo apt-get install -y git
-command -v ansible-playbook &>/dev/null || sudo apt-get install -y ansible
+install_deps() {
+    if echo "$OS_FAMILY" | grep -qiE "debian|ubuntu"; then
+        echo "[bootstrap] Detected Debian/Ubuntu"
+        sudo apt-get update -qq
+        command -v git &>/dev/null || sudo apt-get install -y git
+        if ! command -v ansible-playbook &>/dev/null; then
+            command -v pipx &>/dev/null || sudo apt-get install -y pipx
+            pipx install ansible
+            export PATH="$PATH:$HOME/.local/bin"
+        fi
+    else
+        echo "[bootstrap] Unsupported OS: $OS_FAMILY"
+        echo "Install git and ansible manually, then re-run this script."
+        exit 1
+    fi
+}
 
 # --- Clone repo ---
 
-if [ -d "$CLONE_DIR/.git" ]; then
-    echo "[bootstrap] Repo already cloned at $CLONE_DIR"
-else
+clone_repo() {
+    if [ -d "$CLONE_DIR/.git" ]; then
+        echo "[bootstrap] Repo already cloned at $CLONE_DIR"
+        return
+    fi
+
     mkdir -p "$(dirname "$CLONE_DIR")"
     echo "[bootstrap] Cloning $REPO ..."
     git clone "https://github.com/${REPO}.git" "$CLONE_DIR"
-fi
+}
 
 # --- Run playbook ---
 
-cd "$CLONE_DIR/provision/ansible"
-echo ""
-echo "[bootstrap] Running Ansible playbook ..."
-echo ""
-sudo -E ansible-playbook site.yml -e "target_user=$USER" -e "target_home=$HOME"
+run_playbook() {
+    cd "$CLONE_DIR/provision/ansible"
+    echo ""
+    echo "[bootstrap] Running Ansible playbook ..."
+    echo "You will be prompted for your sudo password."
+    echo ""
+    ansible-playbook site.yml --ask-become-pass
+}
+
+install_deps
+clone_repo
+run_playbook
