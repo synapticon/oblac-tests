@@ -11,9 +11,6 @@ on:
         description: 'Motion Master API image tag (e.g. v0.0.382)'
         default: 'v0.0.382'
         required: false
-      mm_mac:
-        description: 'EtherCAT interface MAC address'
-        required: true
       test_filter:
         description: 'Test file/pattern to run (empty = all tests)'
         default: ''
@@ -43,7 +40,6 @@ jobs:
           CI: 'true'
           MM_VERSION: ${{ inputs.mm_version }}
           MM_API_VERSION: ${{ inputs.mm_api_version }}
-          MM_MAC: ${{ inputs.mm_mac }}
         run: |
           if [ -n "${{ inputs.test_filter }}" ]; then
             npx vitest run ${{ inputs.test_filter }}
