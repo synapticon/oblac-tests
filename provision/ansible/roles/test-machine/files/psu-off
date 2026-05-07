@@ -1,2 +1,2 @@
 #!/bin/sh
-exec curl -fsS "${PSU_URL:-http://192.168.212.103}/output-off"
+exec curl -fsS -o /dev/null "${PSU_URL:-http://192.168.212.103}/output-off"
