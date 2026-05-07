@@ -21,6 +21,7 @@ packages:
   # dev tooling
   - gh
   - lazygit
+  - vim
 
   # Docker
   - docker.io

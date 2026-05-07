@@ -11,7 +11,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   - `mm-api.ts` — generated TypeScript client from the Motion Master OpenAPI spec (do not edit by hand)
 - **`tests/`** — Vitest test files; all tests run sequentially (single device attached)
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
-- **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. The role does two things: `apt install` everything in `roles/test-machine/vars/main.yml` (Docker, Node.js, Python, build tools, `gh`, `lazygit`) and add the user to the `docker` group. All packages come from Ubuntu apt — do not introduce upstream PPAs, third-party repos, or tarball downloads when adding tooling.
+- **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. The role: `apt install` everything in `roles/test-machine/vars/main.yml` (Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`), `snap install code --classic`, and add the user to the `docker` group. Ordering when adding new tooling: apt first; snap (via `community.general.snap`) as the fallback when a package isn't in 26.04 universe — do not introduce upstream PPAs, third-party apt repos, or tarball downloads.
 - **`docker-compose.yml`** — runs `synapticon/motion-master` and `synapticon/motion-master-api` containers
 
 ## Commands

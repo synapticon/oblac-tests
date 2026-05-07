@@ -19,7 +19,7 @@ The target platform is **Ubuntu 26.04 LTS**. To provision a fresh machine:
 bash <(curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh)
 ```
 
-This installs all dependencies from Ubuntu's apt repositories (Docker, Node.js, Python, build tools, `gh`, `lazygit`), clones the repository, runs `npm install`, and creates `.env` from `.env.example`. After it completes, set `MM_MAC` in `.env` and run the tests.
+This installs Docker, Node.js, Python, build tools, `gh`, `lazygit`, and `vim` from Ubuntu apt, plus VS Code as a snap. It then clones the repository, runs `npm install`, and creates `.env` from `.env.example`. After it completes, set `MM_MAC` in `.env` and run the tests.
 
 To re-provision an existing machine:
 

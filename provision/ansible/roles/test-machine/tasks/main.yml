@@ -5,6 +5,11 @@
     state: present
     update_cache: true
 
+- name: Install VS Code
+  community.general.snap:
+    name: code
+    classic: true
+
 - name: Add user to docker group
   ansible.builtin.user:
     name: "{{ username }}"
