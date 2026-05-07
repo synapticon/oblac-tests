@@ -22,7 +22,7 @@ on:
 jobs:
   test:
     name: Run tests
-    runs-on: [self-hosted, L7430]
+    runs-on: [self-hosted, OptiPlex-3080]
     timeout-minutes: 60
 
     steps:

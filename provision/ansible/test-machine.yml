@@ -41,3 +41,9 @@
     - name: Remind to configure .env
       ansible.builtin.debug:
         msg: "Edit {{ repo_dir }}/.env and set MM_MAC to the EtherCAT interface MAC address before running tests."
+
+- name: Set up GitHub Actions runner
+  hosts: local
+  become: false
+  roles:
+    - actions-runner

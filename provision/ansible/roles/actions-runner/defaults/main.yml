@@ -1,0 +1,6 @@
+---
+runner_repo: synapticon/oblac-tests
+runner_dir: "{{ home_dir }}/actions-runner"
+runner_name: "{{ ansible_facts.hostname }}"
+runner_extra_labels:
+  - "{{ ansible_facts.hostname }}"
