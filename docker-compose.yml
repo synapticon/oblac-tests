@@ -1,6 +1,6 @@
 services:
   motion-master:
-    image: synapticon/motion-master:${MM_VERSION:-v5.4.1-flatbot.12}
+    image: synapticon/motion-master:${MM_VERSION:-v5.4.1-flatbot.13}
     container_name: motion-master
     network_mode: host
     privileged: true
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   motion-master-api:
-    image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.382}
+    image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.385}
     container_name: motion-master-api
     network_mode: host
     depends_on:
