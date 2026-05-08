@@ -82,6 +82,18 @@ npm run test:watch   # re-run on file changes
 npm run test:ui      # browser UI at http://localhost:51204
 ```
 
+### Test output
+
+Each line is prefixed with its source so HTTP traffic and container logs interleave readably:
+
+| Prefix | Source |
+|---|---|
+| `[api]` | HTTP call to the Motion Master API (`method url → status (Xms)`) |
+| `[psu]` | HTTP call to the P1535 PSU controller |
+| `[mm]` | Streamed stdout/stderr from the `motion-master` container |
+
+Per-test and per-hook timeout is 5 min; teardown timeout is 60 s. Configurable in `vitest.config.ts`.
+
 ## Configuration
 
 All configuration is via environment variables in `.env` (see `.env.example`).

@@ -5,9 +5,10 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
 ## Architecture
 
 - **`src/`** — shared test infrastructure
-  - `global-setup.ts` — Vitest global setup/teardown: starts Docker services, waits for the MM API, connects to Motion Master
+  - `global-setup.ts` — Vitest global setup/teardown: starts Docker services, streams `motion-master` container stdout/stderr to the test output, waits for the MM API, connects to Motion Master
   - `setup.ts` — per-test exports: `api` (Motion Master HTTP client) and `psu` (PSU power control)
   - `psu.ts` — HTTP client for the ESP32 PSU controller (`PSU_URL`)
+  - `log-fetch.ts` — wraps `fetch` to log method/URL/status/duration; used by `api` and `psu` so every endpoint call appears in the test output
   - `mm-api.ts` — generated TypeScript client from the Motion Master OpenAPI spec (do not edit by hand)
 - **`tests/`** — Vitest test files; all tests run sequentially (single device attached)
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
@@ -51,6 +52,7 @@ Key variables (see `.env.example` for full list):
 ## Notes
 
 - Tests run sequentially (`pool: forks`, `singleFork: true`) — only one device is connected.
-- Global timeout is 60 s per test; the offset-detection test uses its own 300 s timeout.
+- Global timeout is 5 min per test and per hook; teardown is 60 s.
 - On CI, `docker compose down` is called in teardown. Locally, containers are left running.
 - `mm-api.ts` is generated — regenerate with `npm run generate:api` after the swagger spec changes.
+- Test output is tagged: `[api]` for Motion Master HTTP calls, `[psu]` for PSU controller calls, `[mm]` for streamed `motion-master` container logs.

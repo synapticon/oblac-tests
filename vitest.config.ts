@@ -3,10 +3,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
-    // Hardware tests need longer timeouts
-    timeout: 60_000,
-    hookTimeout: 120_000,
-    teardownTimeout: 30_000,
+    // Hardware tests need long timeouts (PSU power-cycle + EtherCAT enumeration + procedures)
+    testTimeout: 300_000,
+    hookTimeout: 300_000,
+    teardownTimeout: 60_000,
     globalSetup: './src/global-setup.ts',
     include: ['tests/system.test.ts', 'tests/offset-detection.test.ts'],
     reporters: ['verbose'],
