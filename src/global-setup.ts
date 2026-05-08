@@ -11,7 +11,7 @@ const port = process.env.MM_API_PORT ?? '63526';
 const apiBase = `http://localhost:${port}/api`;
 const api = new Api({
   baseUrl: apiBase,
-  customFetch: (input, init) => logFetch('api', input, init),
+  customFetch: (input, init) => logFetch('req', input, init),
 });
 
 // Polls GET /version until Motion Master API is accepting requests.
@@ -19,7 +19,7 @@ async function waitForApi(timeoutMs = 60_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const res = await logFetch('api', `${apiBase}/version`);
+      const res = await logFetch('req', `${apiBase}/version`);
       if (res.ok) {
         return;
       }
@@ -81,23 +81,24 @@ async function connectToMotionMaster(timeoutMs = 120_000): Promise<void> {
   throw new Error(`Could not connect to Motion Master after ${timeoutMs}ms`);
 }
 
-// Streams the motion-master container's stdout/stderr into the test output,
-// prefixed so it interleaves cleanly with [mm]/[psu] HTTP logs.
-let logProc: ChildProcess | undefined;
-function streamMotionMasterLogs() {
-  logProc = spawn('docker', ['logs', '-f', '--tail=0', 'motion-master'], {
+// Streams a container's stdout/stderr into the test output, prefixed so it interleaves
+// cleanly with [api]/[psu] HTTP logs.
+const logProcs: ChildProcess[] = [];
+function streamContainerLogs(container: string, tag: string) {
+  const proc = spawn('docker', ['logs', '-f', '--tail=0', container], {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
-  const forward = (tag: string) => (chunk: Buffer) => {
+  const forward = (chunk: Buffer) => {
     for (const line of chunk.toString().split('\n')) {
       if (line.length > 0) {
         process.stdout.write(`[${tag}] ${line}\n`);
       }
     }
   };
-  logProc.stdout?.on('data', forward('mm'));
-  logProc.stderr?.on('data', forward('mm'));
-  logProc.unref();
+  proc.stdout?.on('data', forward);
+  proc.stderr?.on('data', forward);
+  proc.unref();
+  logProcs.push(proc);
 }
 
 // Starts motion-master and motion-master-api containers, then waits until ready.
@@ -111,7 +112,8 @@ export async function setup() {
     });
     execSync('docker compose up -d', { stdio: 'inherit' });
   }
-  streamMotionMasterLogs();
+  streamContainerLogs('motion-master', 'mm');
+  streamContainerLogs('motion-master-api', 'api');
   await waitForApi();
   await connectToMotionMaster();
   await psu.on();
@@ -125,7 +127,9 @@ export async function teardown() {
   } catch (e) {
     console.log(`psu.off() in teardown failed: ${e}`);
   }
-  logProc?.kill('SIGTERM');
+  for (const p of logProcs) {
+    p.kill('SIGTERM');
+  }
   if (process.env.CI) {
     execSync('docker compose down', { stdio: 'inherit' });
   }

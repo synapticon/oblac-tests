@@ -88,9 +88,10 @@ Each line is prefixed with its source so HTTP traffic and container logs interle
 
 | Prefix | Source |
 |---|---|
-| `[api]` | HTTP call to the Motion Master API (`method url → status (Xms)`) |
+| `[req]` | Outgoing HTTP request from the test process (`method url → status (Xms)`) |
 | `[psu]` | HTTP call to the P1535 PSU controller |
 | `[mm]` | Streamed stdout/stderr from the `motion-master` container |
+| `[api]` | Streamed stdout/stderr from the `motion-master-api` container |
 
 Per-test and per-hook timeout is 5 min; teardown timeout is 60 s. Configurable in `vitest.config.ts`.
 

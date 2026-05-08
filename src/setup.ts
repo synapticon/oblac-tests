@@ -7,6 +7,6 @@ import { logFetch } from './log-fetch.js';
 
 export const api = new Api({
   baseUrl: process.env.MM_API_URL ?? 'http://localhost:63526/api',
-  customFetch: (input, init) => logFetch('api', input, init),
+  customFetch: (input, init) => logFetch('req', input, init),
 });
 export { psu } from './psu.js';
