@@ -1,19 +1,12 @@
 import { afterAll, beforeAll, expect, test } from 'vitest';
 import { api, psu } from '../src/setup.js';
+import { integroTestDevice } from '../src/test-devices.js';
 
 beforeAll(() => psu.on());
 afterAll(() => psu.off());
 
 test('run-offset-detection', async () => {
-  const { data: devices } = await api.devices.getDevices({ 'request-timeout': 20_000 });
-  if (devices.length === 0) {
-    throw new Error('No devices found — cannot run offset detection');
-  }
-
-  const device = devices[0];
-  const deviceRef = String(device.position);
-
-  const { data: steps } = await api.devices.runOffsetDetection(deviceRef);
+  const { data: steps } = await api.devices.runOffsetDetection(integroTestDevice.serialNumber);
 
   console.log('\nOffset detection results:');
   for (const step of steps) {
