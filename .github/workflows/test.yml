@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       mm_version:
-        description: 'Motion Master image tag (e.g. v5.4.1-flatbot.12)'
-        default: 'v5.4.1-flatbot.12'
+        description: 'Motion Master image tag (e.g. v5.4.1-flatbot.13)'
+        default: 'v5.4.1-flatbot.13'
         required: false
       mm_api_version:
-        description: 'Motion Master API image tag (e.g. v0.0.382)'
-        default: 'v0.0.382'
+        description: 'Motion Master API image tag (e.g. v0.0.383)'
+        default: 'v0.0.383'
         required: false
       test_filter:
         description: 'Test file/pattern to run (empty = all tests)'
