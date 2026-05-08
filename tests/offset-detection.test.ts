@@ -1,12 +1,15 @@
-import { afterAll, beforeAll, expect, test } from 'vitest';
-import { api, psu } from '../src/setup.js';
+import { expect, test } from 'vitest';
+import { api } from '../src/setup.js';
 import { integroTestDevice } from '../src/test-devices.js';
 
-beforeAll(() => psu.on());
-afterAll(() => psu.off());
-
 test('run-offset-detection', async () => {
-  const { data: steps } = await api.devices.runOffsetDetection(integroTestDevice.serialNumber);
+  const { data: steps } = await api.devices.runOffsetDetection(
+    integroTestDevice.serialNumber,
+    undefined,
+    // request-timeout is a server-side timeout the gateway honours but the generated
+    // type doesn't expose for this endpoint. 240 s — bump if procedures get longer.
+    { query: { 'request-timeout': 240_000 } } as any,
+  );
 
   console.log('\nOffset detection results:');
   for (const step of steps) {

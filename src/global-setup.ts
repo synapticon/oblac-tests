@@ -1,9 +1,11 @@
 // Vitest global setup — runs once before the entire test suite, then teardown once after.
-// Sequence: start Docker services → wait for MM API HTTP → connect MM to EtherCAT bus.
+// Sequence: start Docker services → wait for MM API HTTP → connect MM to EtherCAT bus →
+// power on PSU → wait until devices enumerate. Teardown powers off the PSU.
 
 import { execSync, spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { Api } from './mm-api.js';
 import { logFetch } from './log-fetch.js';
+import { psu } from './psu.js';
 
 const port = process.env.MM_API_PORT ?? '63526';
 const apiBase = `http://localhost:${port}/api`;
@@ -25,6 +27,35 @@ async function waitForApi(timeoutMs = 60_000): Promise<void> {
     await new Promise((r) => setTimeout(r, 1_000));
   }
   throw new Error(`Motion Master API not ready after ${timeoutMs}ms`);
+}
+
+// Polls GET /devices with a short per-poll request-timeout until Motion Master returns a
+// non-empty device list. This is the real readiness gate: a 200 response with devices means
+// MM is past EtherCAT enumeration and able to service requests; a 500 "Timeout has occurred"
+// means MM is still busy initializing.
+async function waitForDevices(timeoutMs = 90_000, pollTimeoutMs = 2_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  let lastError: unknown;
+  while (Date.now() < deadline) {
+    try {
+      const { data } = await api.devices.getDevices({
+        'request-timeout': pollTimeoutMs,
+      });
+      if (data.length > 0) {
+        console.log(`Motion Master ready: ${data.length} device(s) enumerated`);
+        return;
+      }
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  const suffix =
+    lastError && typeof lastError === 'object' && 'error' in lastError
+      ? ` (last error: ${JSON.stringify((lastError as { error: unknown }).error)})`
+      : '';
+  throw new Error(
+    `Motion Master did not enumerate any devices within ${timeoutMs}ms${suffix}`,
+  );
 }
 
 // Calls POST /connect until the API has established both WebSocket connections to Motion Master
@@ -83,10 +114,17 @@ export async function setup() {
   streamMotionMasterLogs();
   await waitForApi();
   await connectToMotionMaster();
+  await psu.on();
+  await waitForDevices();
 }
 
 // Stops and removes containers. Skipped locally so containers stay up between runs.
-export function teardown() {
+export async function teardown() {
+  try {
+    await psu.off();
+  } catch (e) {
+    console.log(`psu.off() in teardown failed: ${e}`);
+  }
   logProc?.kill('SIGTERM');
   if (process.env.CI) {
     execSync('docker compose down', { stdio: 'inherit' });
