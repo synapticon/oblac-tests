@@ -3,11 +3,13 @@ import type { RequestParams } from '../src/mm-api.js';
 import { api } from '../src/setup.js';
 import { integroTestDevice } from '../src/test-devices.js';
 
+const device = integroTestDevice;
+
 test('run-offset-detection', async () => {
-  await api.devices.resetFault(integroTestDevice.serialNumber, { force: true });
+  await api.devices.resetFault(device.serialNumber, { force: true });
 
   const { data: steps } = await api.devices.runOffsetDetection(
-    integroTestDevice.serialNumber,
+    device.serialNumber,
     undefined,
     // request-timeout is a server-side timeout the gateway honours but the generated
     // type doesn't expose for this endpoint. 240 s — bump if procedures get longer.
