@@ -5,7 +5,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
 ## Architecture
 
 - **`src/`** — shared test infrastructure
-  - `global-setup.ts` — Vitest global setup/teardown: starts Docker services, streams `motion-master` and `motion-master-api` container stdout/stderr to the test output, waits for the MM API, connects to Motion Master, powers on the PSU and polls `GET /devices` until enumeration succeeds. Teardown powers off the PSU.
+  - `global-setup.ts` — Vitest global setup/teardown: starts Docker services, streams `motion-master` and `motion-master-api` container stdout/stderr to the test output, waits 3 s for containers to come up, waits for the MM API, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, then polls `GET /devices` until enumeration succeeds. Teardown powers off the PSU.
   - `setup.ts` — per-test exports: `api` (Motion Master HTTP client) and `psu` (PSU power control)
   - `psu.ts` — HTTP client for the ESP32 PSU controller (`PSU_URL`)
   - `log-fetch.ts` — wraps `fetch` to log method/URL/status/duration with a `[req]` prefix; used by `api` and `psu` so every endpoint call appears in the test output
@@ -26,6 +26,12 @@ npm run test:watch    # watch mode
 npm run test:ui       # Vitest browser UI
 npm run typecheck     # tsc --noEmit
 npm run generate:api  # regenerate mm-api.ts from the live swagger spec
+```
+
+Dispatch CI with specific image versions:
+
+```bash
+./run-ci.sh <mm_version> <mm_api_version> [test_filter]
 ```
 
 ## Environment

@@ -113,6 +113,8 @@ export async function setup() {
   }
   streamContainerLogs('motion-master', 'mm');
   streamContainerLogs('motion-master-api', 'api');
+  console.log('Waiting 3 s for containers to start...');
+  await resolveAfter(3_000);
   await waitForApi();
   await connectToMotionMaster();
   await psu.on();

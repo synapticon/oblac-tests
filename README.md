@@ -61,6 +61,20 @@ Per-job diagnostics live in `~/actions-runner/_diag/` and `~/actions-runner/_wor
 
 The CI workflow (`.github/workflows/test.yml`) is `workflow_dispatch`-only and targets `runs-on: [self-hosted, OptiPlex-3080]`. To target a different machine, change the second label to that machine's hostname (each runner is auto-labelled with its hostname by the playbook).
 
+## Triggering CI
+
+Use `run-ci.sh` to dispatch the workflow with specific image versions:
+
+```bash
+./run-ci.sh <mm_version> <mm_api_version> [test_filter]
+
+# Examples:
+./run-ci.sh v5.4.1-flatbot.16 v0.0.385           # run all tests
+./run-ci.sh v5.4.1-flatbot.16 v0.0.385 offset     # run tests matching "offset"
+```
+
+Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.
+
 ## Setup
 
 ```bash
@@ -75,7 +89,7 @@ npm install
 npm test
 ```
 
-Vitest starts the Docker services, connects to Motion Master, powers on the PSU, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
+Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
 
 ```bash
 npm run test:watch   # re-run on file changes
