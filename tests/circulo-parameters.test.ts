@@ -1,8 +1,16 @@
+import * as semver from 'semver';
 import { expect, test } from 'vitest';
 import { api } from '../src/setup.js';
 import { circuloTestDevice } from '../src/test-devices.js';
 
 const device = circuloTestDevice;
+
+test('read firmware version', async () => {
+  const { data } = await api.devices.getDeviceParameterValues(device.serialNumber, [{ index: 0x100a, subindex: 0 }]);
+  const [fw] = data.parameterValues ?? [];
+  expect(semver.valid(fw?.stringValue)).not.toBeNull();
+  console.log(`firmware version: ${fw?.stringValue}`);
+});
 
 test('read statusword', async () => {
   const { data } = await api.devices.getDeviceParameterValues(device.serialNumber, [{ index: 0x6041, subindex: 0 }]);
