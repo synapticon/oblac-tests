@@ -9,7 +9,7 @@ Tests run against a real device connected via EtherCAT. Motion Master and its HT
 - Docker (with Compose v2)
 - Node.js ≥ 22
 - A SOMANET device reachable via EtherCAT
-- *(optional)* A P1535 PSU controller on the local network
+- _(optional)_ A P1535 PSU controller on the local network
 
 ## Provisioning a test machine
 
@@ -79,8 +79,8 @@ Use `run-ci.sh` to dispatch the workflow with specific image versions:
 ./run-ci.sh <mm_version> <mm_api_version> [test_filter]
 
 # Examples:
-./run-ci.sh v5.4.1-flatbot.16 v0.0.385           # run all tests
-./run-ci.sh v5.4.1-flatbot.16 v0.0.385 offset     # run tests matching "offset"
+./run-ci.sh v5.4.1-flatbot.16 v0.0.386           # run all tests
+./run-ci.sh v5.4.1-flatbot.16 v0.0.386 offset     # run tests matching "offset"
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.
@@ -110,12 +110,12 @@ npm run test:ui      # browser UI at http://localhost:51204
 
 Each line is prefixed with its source so HTTP traffic and container logs interleave readably:
 
-| Prefix | Source |
-|---|---|
+| Prefix  | Source                                                                    |
+| ------- | ------------------------------------------------------------------------- |
 | `[req]` | Outgoing HTTP request from the test process (`method url → status (Xms)`) |
-| `[psu]` | HTTP call to the P1535 PSU controller |
-| `[mm]` | Streamed stdout/stderr from the `motion-master` container |
-| `[api]` | Streamed stdout/stderr from the `motion-master-api` container |
+| `[psu]` | HTTP call to the P1535 PSU controller                                     |
+| `[mm]`  | Streamed stdout/stderr from the `motion-master` container                 |
+| `[api]` | Streamed stdout/stderr from the `motion-master-api` container             |
 
 Per-test and per-hook timeout is 5 min; teardown timeout is 60 s. Configurable in `vitest.config.ts`.
 
@@ -125,11 +125,21 @@ All configuration is via environment variables in `.env` (see `.env.example`).
 
 The most important ones:
 
-| Variable | Description |
-|---|---|
-| `MM_MAC` | MAC address of the EtherCAT network interface *(required)* |
-| `PSU_URL` | Base URL of the ESP32 PSU controller (default `http://192.168.212.103`) |
-| `MM_API_PORT` | HTTP API port (default `63526`) |
+| Variable      | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- |
+| `MM_MAC`      | MAC address of the EtherCAT network interface _(required)_              |
+| `PSU_URL`     | Base URL of the ESP32 PSU controller (default `http://192.168.212.103`) |
+| `MM_API_PORT` | HTTP API port (default `63526`)                                         |
+
+## Device fixture files
+
+Each device on the test rig has a subdirectory under `devices/<serial>/` containing:
+
+- `config.csv` — saved parameter set used by config tests (`load-config` / `save-config`)
+- `.hardware_description` — EtherCAT hardware description file
+- `.factory_config`, `.safety_parameters_report` — optional factory files
+
+The serial number subdirectory matches the device serial number reported by Motion Master (e.g. `8612-02-0001553-2341`). Tests resolve the path dynamically from the device's serial number, so adding a new device only requires adding its fixture directory.
 
 ## Regenerating the API client
 
