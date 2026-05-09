@@ -108,6 +108,7 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `circulo-config.test.ts` | `save-config`, `load-config`, and parameter restore on the Circulo 7 |
 | `offset-detection.test.ts` | Full offset detection run on the Integro-60 |
 | `device-files.test.ts` | File system operations (list, upload, download, delete) on Circulo and Integro; regular and hidden files, unlock semantics, error paths |
+| `circulo-profiles.test.ts` | Position profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
 
 ```bash
 npm run test:watch   # re-run on file changes
