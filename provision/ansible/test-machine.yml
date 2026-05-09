@@ -4,6 +4,7 @@
   become: true
   roles:
     - test-machine
+    - rustdesk
 
 - name: Set up test environment
   hosts: local

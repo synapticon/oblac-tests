@@ -1,0 +1,51 @@
+---
+- name: Check if RustDesk is installed
+  ansible.builtin.command: dpkg-query -W rustdesk
+  register: rustdesk_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install RustDesk
+  when: rustdesk_installed.rc != 0
+  block:
+    - name: Fetch latest RustDesk release
+      ansible.builtin.uri:
+        url: https://api.github.com/repos/rustdesk/rustdesk/releases/latest
+        return_content: true
+      register: rustdesk_release
+
+    - name: Resolve deb download URL
+      ansible.builtin.set_fact:
+        rustdesk_deb_url: >-
+          {{ rustdesk_release.json.assets
+             | selectattr('name', 'match', '.*x86_64\\.deb$')
+             | map(attribute='browser_download_url')
+             | first }}
+
+    - name: Download RustDesk deb
+      ansible.builtin.get_url:
+        url: "{{ rustdesk_deb_url }}"
+        dest: /tmp/rustdesk.deb
+        mode: "0644"
+
+    - name: Install RustDesk deb
+      ansible.builtin.apt:
+        deb: /tmp/rustdesk.deb
+
+    - name: Remove downloaded deb
+      ansible.builtin.file:
+        path: /tmp/rustdesk.deb
+        state: absent
+
+- name: Enable and start RustDesk service
+  ansible.builtin.systemd:
+    name: rustdesk
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Set permanent RustDesk password
+  when: rustdesk_password | length > 0
+  ansible.builtin.command: rustdesk --password {{ rustdesk_password }}
+  no_log: true
+  changed_when: true
