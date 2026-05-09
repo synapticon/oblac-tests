@@ -3,6 +3,7 @@
 // power on PSU → wait until devices enumerate. Teardown powers off the PSU.
 
 import { type ChildProcess, execSync, spawn, spawnSync } from 'node:child_process';
+import { resolveAfter } from 'motion-master-client';
 import { logFetch } from './log-fetch.js';
 import { Api } from './mm-api.js';
 import { psu } from './psu.js';
@@ -115,6 +116,7 @@ export async function setup() {
   await waitForApi();
   await connectToMotionMaster();
   await psu.on();
+  await resolveAfter(10_000);
   await waitForDevices();
 }
 
