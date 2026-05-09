@@ -101,6 +101,14 @@ npm test
 
 Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
 
+| Test file | What it covers |
+| --- | --- |
+| `system.test.ts` | MM client/system version, device enumeration |
+| `circulo-parameters.test.ts` | Read/write individual parameters on the Circulo 7 |
+| `circulo-config.test.ts` | `save-config`, `load-config`, and parameter restore on the Circulo 7 |
+| `offset-detection.test.ts` | Full offset detection run on the Integro-60 |
+| `device-files.test.ts` | File system operations (list, upload, download, delete) on Circulo and Integro; regular and hidden files, unlock semantics, error paths |
+
 ```bash
 npm run test:watch   # re-run on file changes
 npm run test:ui      # browser UI at http://localhost:51204

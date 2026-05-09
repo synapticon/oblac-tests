@@ -4,8 +4,10 @@ export interface TestDevice {
   position: number;
   /** Device serial number in `PPPP-VV-SSSSSSS-YYWW` format. */
   serialNumber: string;
-  /** Human-readable device name. */
+  /** Short label used in test names (e.g. 'circulo', 'integro', 'node'). */
   name: string;
+  /** Full product name. */
+  productName: string;
 }
 
 /**
@@ -15,16 +17,18 @@ export interface TestDevice {
  * Tests that target a specific device select it by serial number.
  */
 export const testDevices: TestDevice[] = [
-  { position: 1, serialNumber: '9501-01-0001512-1851', name: 'Node 400 EtherCAT' },
+  { position: 1, serialNumber: '9501-01-0001512-1851', name: 'node', productName: 'Node 400 EtherCAT' },
   {
     position: 2,
     serialNumber: '9002-02-0000466-2339',
-    name: 'Integro-60 R1.5 (600 W, EtherCAT, STO, 18 bit + MT + IOs)',
+    name: 'integro',
+    productName: 'Integro-60 R1.5 (600 W, EtherCAT, STO, 18 bit + MT + IOs)',
   },
   {
     position: 3,
     serialNumber: '8612-02-0001553-2341',
-    name: 'Circulo 7 Safe Motion - 700, Magnetic Rings (pos.1&2), no external encoders',
+    name: 'circulo',
+    productName: 'Circulo 7 Safe Motion - 700, Magnetic Rings (pos.1&2), no external encoders',
   },
 ];
 
