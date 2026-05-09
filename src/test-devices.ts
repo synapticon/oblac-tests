@@ -34,4 +34,3 @@ export const nodeTestDevice: TestDevice = testDevices[0]!;
 export const integroTestDevice: TestDevice = testDevices[1]!;
 /** SOMANET Circulo 7 with Safe Motion Module at EtherCAT position 3. */
 export const circuloTestDevice: TestDevice = testDevices[2]!;
-

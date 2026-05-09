@@ -2,9 +2,9 @@
 // Sequence: start Docker services → wait for MM API HTTP → connect MM to EtherCAT bus →
 // power on PSU → wait until devices enumerate. Teardown powers off the PSU.
 
-import { execSync, spawn, spawnSync, type ChildProcess } from 'node:child_process';
-import { Api } from './mm-api.js';
+import { type ChildProcess, execSync, spawn, spawnSync } from 'node:child_process';
 import { logFetch } from './log-fetch.js';
+import { Api } from './mm-api.js';
 import { psu } from './psu.js';
 
 const port = process.env.MM_API_PORT ?? '63526';
@@ -53,9 +53,7 @@ async function waitForDevices(timeoutMs = 90_000, pollTimeoutMs = 2_000): Promis
     lastError && typeof lastError === 'object' && 'error' in lastError
       ? ` (last error: ${JSON.stringify((lastError as { error: unknown }).error)})`
       : '';
-  throw new Error(
-    `Motion Master did not enumerate any devices within ${timeoutMs}ms${suffix}`,
-  );
+  throw new Error(`Motion Master did not enumerate any devices within ${timeoutMs}ms${suffix}`);
 }
 
 // Calls POST /connect until the API has established both WebSocket connections to Motion Master

@@ -7,12 +7,7 @@ export async function logFetch(
   init?: Parameters<typeof fetch>[1],
 ): Promise<Response> {
   const method = init?.method ?? 'GET';
-  const url =
-    typeof input === 'string'
-      ? input
-      : input instanceof URL
-        ? input.toString()
-        : input.url;
+  const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
   const start = Date.now();
   try {
     const res = await fetch(input, init);

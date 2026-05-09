@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       mm_version:
-        description: 'Motion Master image tag (e.g. v5.4.1-flatbot.13)'
-        default: 'v5.4.1-flatbot.13'
+        description: "Motion Master image tag (e.g. v5.4.1-flatbot.16)"
+        default: "v5.4.1-flatbot.16"
         required: false
       mm_api_version:
-        description: 'Motion Master API image tag (e.g. v0.0.385)'
-        default: 'v0.0.385'
+        description: "Motion Master API image tag (e.g. v0.0.385)"
+        default: "v0.0.385"
         required: false
       test_filter:
-        description: 'Test file/pattern to run (empty = all tests)'
-        default: ''
+        description: "Test file/pattern to run (empty = all tests)"
+        default: ""
         required: false
 
 jobs:
@@ -22,16 +22,16 @@ jobs:
     runs-on: [self-hosted, OptiPlex-3080]
     timeout-minutes: 60
     env:
-      CI: 'true'
+      CI: "true"
       MM_VERSION: ${{ inputs.mm_version }}
       MM_API_VERSION: ${{ inputs.mm_api_version }}
-      MM_MAC: 'A4:BB:6D:77:0B:D2'
+      MM_MAC: "A4:BB:6D:77:0B:D2"
       MM_DRV: soem
-      MM_REQ_RES_PORT: '63524'
-      MM_PUB_SUB_PORT: '63525'
-      MM_API_PORT: '63526'
+      MM_REQ_RES_PORT: "63524"
+      MM_PUB_SUB_PORT: "63525"
+      MM_API_PORT: "63526"
       MM_PDO_MODE: monitor
-      PSU_URL: 'http://192.168.212.103'
+      PSU_URL: "http://192.168.212.103"
 
     steps:
       - name: Checkout
@@ -40,7 +40,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install dependencies
         run: npm ci --prefer-offline --no-audit
