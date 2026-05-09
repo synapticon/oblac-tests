@@ -29,8 +29,8 @@ export const testDevices: TestDevice[] = [
 ];
 
 /** SOMANET Node 400 EtherCAT at EtherCAT position 1. */
-export const nodeTestDevice: TestDevice = testDevices[0]!;
+export const nodeTestDevice: TestDevice = testDevices[0] as TestDevice;
 /** SOMANET Integro-60 at EtherCAT position 2. */
-export const integroTestDevice: TestDevice = testDevices[1]!;
+export const integroTestDevice: TestDevice = testDevices[1] as TestDevice;
 /** SOMANET Circulo 7 with Safe Motion Module at EtherCAT position 3. */
-export const circuloTestDevice: TestDevice = testDevices[2]!;
+export const circuloTestDevice: TestDevice = testDevices[2] as TestDevice;
