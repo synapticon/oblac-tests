@@ -625,7 +625,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
 /**
  * @title Motion Master API
- * @version 0.0.382
+ * @version 0.0.386
  * @license MIT (https://opensource.org/licenses/MIT)
  * @baseUrl http://{hostname}:{port}/api
  * @contact <msankovic@synapticon.com>
@@ -670,7 +670,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * Use this option when Motion Master is running on a separate host. The container runs in bridge network mode and the API is published on port 8080:
  *
  * ```terminal
- * docker run -d --name motion-master-api --publish=8080:63526 synapticon/motion-master-api:v0.0.382
+ * docker run -d --name motion-master-api --publish=8080:63526 synapticon/motion-master-api:v0.0.386
  * ```
  *
  * Specify the Motion Master host IP when connecting:
