@@ -15,6 +15,16 @@ on:
         description: "Test file/pattern to run (empty = all tests)"
         default: ""
         required: false
+      stream_api_logs:
+        description: "Stream motion-master-api container logs to the run output"
+        type: boolean
+        default: true
+        required: false
+      stream_mm_logs:
+        description: "Stream motion-master container logs to the run output"
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   test:
@@ -32,6 +42,8 @@ jobs:
       MM_API_PORT: "63526"
       MM_PDO_MODE: monitor
       PSU_URL: "http://192.168.212.103"
+      STREAM_API_LOGS: ${{ inputs.stream_api_logs }}
+      STREAM_MM_LOGS: ${{ inputs.stream_mm_logs }}
 
     steps:
       - name: Checkout

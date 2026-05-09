@@ -111,8 +111,12 @@ export async function setup() {
     });
     execSync('docker compose up -d', { stdio: 'inherit' });
   }
-  streamContainerLogs('motion-master', 'mm');
-  streamContainerLogs('motion-master-api', 'api');
+  if (process.env.STREAM_MM_LOGS === 'true') {
+    streamContainerLogs('motion-master', 'mm');
+  }
+  if (process.env.STREAM_API_LOGS !== 'false') {
+    streamContainerLogs('motion-master-api', 'api');
+  }
   console.log('Waiting 3 s for containers to start...');
   await resolveAfter(3_000);
   await waitForApi();
