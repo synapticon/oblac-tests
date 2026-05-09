@@ -8,7 +8,12 @@ export default defineConfig({
     hookTimeout: 300_000,
     teardownTimeout: 60_000,
     globalSetup: './src/global-setup.ts',
-    include: ['tests/system.test.ts', 'tests/offset-detection.test.ts', 'tests/circulo-parameters.test.ts'],
+    include: [
+      'tests/system.test.ts',
+      'tests/offset-detection.test.ts',
+      'tests/circulo-parameters.test.ts',
+      'tests/circulo-config.test.ts',
+    ],
     reporters: ['verbose'],
     // Run tests sequentially — only one device attached
     pool: 'forks',
