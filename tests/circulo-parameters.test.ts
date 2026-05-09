@@ -122,6 +122,49 @@ test('read and write back commutation angle offset', async () => {
   console.log(`commutation angle offset reverted: ${initial?.intValue}`);
 });
 
+test('upload/download commutation angle offset', async () => {
+  const { data: initial } = await api.devices.uploadParameter(device.serialNumber, '0x2001', '0x00');
+  expect(initial?.value).toBeTypeOf('number');
+  console.log(`commutation angle offset initial: ${initial?.value}`);
+
+  await api.devices.downloadParameter(device.serialNumber, '0x2001', '0x00', 100);
+  const { data: written } = await api.devices.uploadParameter(device.serialNumber, '0x2001', '0x00');
+  expect(written?.value).toBe(100);
+  console.log(`commutation angle offset written: ${written?.value}`);
+
+  await api.devices.downloadParameter(device.serialNumber, '0x2001', '0x00', initial?.value as number);
+  console.log(`commutation angle offset reverted: ${initial?.value}`);
+});
+
+test('upload/download assigned name', async () => {
+  const { data: initial } = await api.devices.uploadParameter(device.serialNumber, '0x20f2', '0x00');
+  expect(initial?.value).toBeTypeOf('string');
+  console.log(`assigned name initial: "${initial?.value}"`);
+
+  await api.devices.downloadParameter(device.serialNumber, '0x20f2', '0x00', 'test-name');
+  const { data: written } = await api.devices.uploadParameter(device.serialNumber, '0x20f2', '0x00');
+  expect(written?.value).toBe('test-name');
+  console.log(`assigned name written: "${written?.value}"`);
+
+  await api.devices.downloadParameter(device.serialNumber, '0x20f2', '0x00', initial?.value as string);
+  console.log(`assigned name reverted: "${initial?.value}"`);
+});
+
+test('upload/download velocity loop Kp', async () => {
+  const { data: initial } = await api.devices.uploadParameter(device.serialNumber, '0x2012', '0x05');
+  expect(initial?.value).toBeTypeOf('number');
+  expect(Number.isFinite(initial?.value as number)).toBe(true);
+  console.log(`velocity loop Kp initial: ${initial?.value}`);
+
+  await api.devices.downloadParameter(device.serialNumber, '0x2012', '0x05', 1.2345);
+  const { data: written } = await api.devices.uploadParameter(device.serialNumber, '0x2012', '0x05');
+  expect(written?.value as number).toBeCloseTo(1.2345, 4);
+  console.log(`velocity loop Kp written: ${written?.value}`);
+
+  await api.devices.downloadParameter(device.serialNumber, '0x2012', '0x05', initial?.value as number);
+  console.log(`velocity loop Kp reverted: ${initial?.value}`);
+});
+
 test('write and read back home offset', async () => {
   await api.devices.setDeviceParameterValues(device.serialNumber, [
     { index: 0x607c, subindex: 0, intValue: 0, typeValue: 'intValue' },
