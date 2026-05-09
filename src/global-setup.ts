@@ -116,6 +116,7 @@ export async function setup() {
   await waitForApi();
   await connectToMotionMaster();
   await psu.on();
+  console.log('Waiting 10 s for Motion Master to enumerate and configure devices...');
   await resolveAfter(10_000);
   await waitForDevices();
 }
