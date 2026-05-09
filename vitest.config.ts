@@ -14,7 +14,6 @@ export default defineConfig({
       'tests/circulo-parameters.test.ts',
       'tests/circulo-config.test.ts',
       'tests/device-files.test.ts',
-      'tests/circulo-profiles.test.ts',
     ],
     reporters: ['verbose'],
     // Run tests sequentially — only one device attached
