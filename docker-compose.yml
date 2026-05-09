@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
   motion-master-api:
-    image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.387}
+    image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.388}
     container_name: motion-master-api
     network_mode: host
     depends_on:
