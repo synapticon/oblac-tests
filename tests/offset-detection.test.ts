@@ -3,6 +3,8 @@ import { api } from '../src/setup.js';
 import { integroTestDevice } from '../src/test-devices.js';
 
 test('run-offset-detection', async () => {
+  await api.devices.resetFault(integroTestDevice.serialNumber, { force: true });
+
   const { data: steps } = await api.devices.runOffsetDetection(
     integroTestDevice.serialNumber,
     undefined,
