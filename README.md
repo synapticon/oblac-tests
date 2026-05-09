@@ -79,8 +79,8 @@ Use `run-ci.sh` to dispatch the workflow with specific image versions:
 ./run-ci.sh <mm_version> <mm_api_version> [test_filter]
 
 # Examples:
-./run-ci.sh v5.4.1-flatbot.16 v0.0.386           # run all tests
-./run-ci.sh v5.4.1-flatbot.16 v0.0.386 offset     # run tests matching "offset"
+./run-ci.sh v5.4.1-flatbot.16 v0.0.387           # run all tests
+./run-ci.sh v5.4.1-flatbot.16 v0.0.387 offset     # run tests matching "offset"
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.

@@ -5,7 +5,7 @@ usage() {
   echo "Usage: $0 <mm_version> <mm_api_version> [test_filter]"
   echo ""
   echo "  mm_version      Motion Master image tag, e.g. v5.4.1-flatbot.16"
-  echo "  mm_api_version  Motion Master API image tag, e.g. v0.0.386"
+  echo "  mm_api_version  Motion Master API image tag, e.g. v0.0.387"
   echo "  test_filter     Optional test file/pattern passed to vitest"
   exit 1
 }
