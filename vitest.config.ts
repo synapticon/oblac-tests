@@ -12,11 +12,15 @@ export default defineConfig({
       'tests/system.test.ts',
       'tests/offset-detection.test.ts',
       'tests/circulo-parameters.test.ts',
-      'tests/circulo-config.test.ts',
-      // 'tests/device-files.test.ts',
+      // 'tests/circulo-config.test.ts',
+      'tests/device-files.test.ts',
       // 'tests/circulo-profiles.test.ts',
     ],
-    reporters: ['verbose'],
+    // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs
+    // do redraw the test tree, but we accept that noise locally for the detail).
+    // CI: 'basic' (no live redraws — clean linear log) plus 'github-actions' for
+    // inline failure annotations on the run summary.
+    reporters: process.env.GITHUB_ACTIONS ? ['basic', 'github-actions'] : ['verbose'],
     // Run tests sequentially — only one device attached
     pool: 'forks',
     poolOptions: {

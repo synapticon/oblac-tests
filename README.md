@@ -101,7 +101,7 @@ npm install
 npm test
 ```
 
-Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 12 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
+Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
 
 | Test file | What it covers |
 | --- | --- |
@@ -109,7 +109,7 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `circulo-parameters.test.ts` | Read/write individual parameters on the Circulo 7 |
 | `circulo-config.test.ts` | `save-config`, `load-config`, and parameter restore on the Circulo 7 |
 | `offset-detection.test.ts` | Full offset detection run on the Integro-60 |
-| `device-files.test.ts` | File system operations (list, upload, download, delete) on Circulo and Integro; regular and hidden files, unlock semantics, error paths |
+| `device-files.test.ts` | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths |
 | `circulo-profiles.test.ts` | Position profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
 
 ```bash
@@ -129,6 +129,8 @@ Each line is prefixed with its source so HTTP traffic and container logs interle
 | `[api]` | Streamed stdout/stderr from the `motion-master-api` container             |
 
 Locally both `[srv]` and `[api]` stream by default. On CI `[srv]` is opt-in (set `STREAM_MM_LOGS=true` to enable). Either stream can be silenced with `STREAM_MM_LOGS=false` / `STREAM_API_LOGS=false`.
+
+The reporter is `verbose` locally — it redraws the test tree on every stdout write, so the streamed container logs cause the tree to reprint repeatedly. That's accepted as noise in exchange for per-test feedback. On CI (`GITHUB_ACTIONS=true`) the reporter switches to `['basic', 'github-actions']`: `basic` is non-interactive so the log stays linear, and `github-actions` emits inline failure annotations on the workflow run summary.
 
 Per-test and per-hook timeout is 5 min; teardown timeout is 60 s. Configurable in `vitest.config.ts`.
 
