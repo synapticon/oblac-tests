@@ -18,6 +18,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   - `offset-detection.test.ts` — full offset detection run on the Integro-60
   - `circulo-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
   - `circulo-profiles.test.ts` — position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
+  - `circulo-smm.test.ts` — SMM (Safe Motion Module) OS commands on the Circulo 7 via `run-os-command`: read SMM firmware version (command `11,13,1,…`, `read-fs-buffer=true`, parsed as `v{fsBuffer[1]}.{fsBuffer[0]}`) and SMM restart (command `11,15,…`)
 - **`devices/`** — per-device fixture files, one subdirectory per serial number (e.g. `devices/8612-02-0001553-2341/`); each contains `config.csv` (saved parameter set loaded by `circulo-config.test.ts`), `.hardware_description`, and optional `.factory_config` / `.safety_parameters_report`
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
 - **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. `play.sh` prompts for the BECOME password and forwards any extra arguments to `ansible-playbook` (`./provision/play.sh -e rustdesk_password=foo`, `./provision/play.sh --tags actions-runner`, etc.). Three roles:
