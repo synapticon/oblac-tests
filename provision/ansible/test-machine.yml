@@ -26,6 +26,12 @@
         scope: global
         value: msankovic@synapticon.com
 
+    - name: Configure git pull to fast-forward only
+      community.general.git_config:
+        name: pull.ff
+        scope: global
+        value: only
+
     - name: Install npm dependencies
       ansible.builtin.command:
         cmd: npm install
