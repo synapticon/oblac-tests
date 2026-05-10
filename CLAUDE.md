@@ -16,13 +16,13 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   - `circulo-parameters.test.ts` — read/write individual parameters on the Circulo 7 (get-parameter-values, set-parameter-values, upload, download)
   - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
   - `offset-detection.test.ts` — full offset detection run on the Integro-60
-  - `device-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
+  - `circulo-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
   - `circulo-profiles.test.ts` — position profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
 - **`devices/`** — per-device fixture files, one subdirectory per serial number (e.g. `devices/8612-02-0001553-2341/`); each contains `config.csv` (saved parameter set loaded by `circulo-config.test.ts`), `.hardware_description`, and optional `.factory_config` / `.safety_parameters_report`
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
-- **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. Three roles:
+- **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. `play.sh` prompts for the BECOME password and forwards any extra arguments to `ansible-playbook` (`./provision/play.sh -e rustdesk_password=foo`, `./provision/play.sh --tags actions-runner`, etc.). Three roles:
   - `test-machine` — installs system packages from `roles/test-machine/vars/main.yml` (Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`), VS Code via snap, configures git for Marko, adds the user to `docker`, and installs `psu-on`/`psu-off` PSU control scripts to `~/.local/bin`.
-  - `rustdesk` — installs RustDesk (latest release from GitHub) for remote desktop access and enables the systemd service. Optional: pass `rustdesk_password` to set a permanent unattended-access password.
+  - `rustdesk` — installs RustDesk (latest release from GitHub) for remote desktop access and enables the systemd service. Optional: pass `rustdesk_password` to set a permanent unattended-access password. The role prints the machine's RustDesk ID at the end of every run via `rustdesk --get-id`.
   - `actions-runner` — registers the machine as a self-hosted GitHub Actions runner for `synapticon/oblac-tests` and installs the runner as a systemd service. Idempotent (skips if `~/actions-runner/.runner` exists). Requires `gh auth login` first; fetches the registration token at runtime via `gh api`.
 - **`docker-compose.yml`** — runs `synapticon/motion-master` and `synapticon/motion-master-api` containers
 - **`.github/workflows/test.yml`** — `workflow_dispatch`-only CI; targets `runs-on: [self-hosted, OptiPlex-3080]` (the test machine's hostname-derived label)

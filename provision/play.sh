@@ -18,4 +18,4 @@ printf '%s\n' "$BECOME_PASS"
 EOF
 export SUDO_ASKPASS="$ASKPASS"
 
-ANSIBLE_BECOME_FLAGS='-H -A' ansible-playbook site.yml
+ANSIBLE_BECOME_FLAGS='-H -A' ansible-playbook site.yml "$@"

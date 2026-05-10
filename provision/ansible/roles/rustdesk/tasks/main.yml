@@ -18,7 +18,7 @@
       ansible.builtin.set_fact:
         rustdesk_deb_url: >-
           {{ rustdesk_release.json.assets
-             | selectattr('name', 'match', '.*x86_64\\.deb$')
+             | selectattr('name', 'match', '.*x86_64\.deb$')
              | map(attribute='browser_download_url')
              | first }}
 
@@ -49,3 +49,12 @@
   ansible.builtin.command: rustdesk --password {{ rustdesk_password }}
   no_log: true
   changed_when: true
+
+- name: Get RustDesk ID
+  ansible.builtin.command: rustdesk --get-id
+  register: rustdesk_id
+  changed_when: false
+
+- name: Show RustDesk ID
+  ansible.builtin.debug:
+    msg: "RustDesk ID: {{ rustdesk_id.stdout | trim }}"

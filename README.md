@@ -36,6 +36,8 @@ To re-provision an existing machine:
 ./provision/play.sh
 ```
 
+`play.sh` prompts for the BECOME (sudo) password and forwards any extra arguments to `ansible-playbook`, so you can pass through tags, extra-vars, limits, etc. — for example `./provision/play.sh -e rustdesk_password=yourpassword` or `./provision/play.sh --tags actions-runner`.
+
 ### Checking the GitHub Actions runner
 
 The runner is installed as a systemd service named `actions.runner.synapticon-oblac-tests.$(hostname).service`.
@@ -67,7 +69,7 @@ RustDesk is installed automatically by the playbook. To set a permanent unattend
 ./provision/play.sh -e rustdesk_password=yourpassword
 ```
 
-The RustDesk ID displayed in the app on the test machine is what you use to connect from your own machine.
+The playbook prints the machine's RustDesk ID at the end of every run (via `rustdesk --get-id`); that's what you use to connect from your own machine. The same ID is also visible in the RustDesk app on the test machine.
 
 The CI workflow (`.github/workflows/test.yml`) is `workflow_dispatch`-only and targets `runs-on: [self-hosted, OptiPlex-3080]`. To target a different machine, change the second label to that machine's hostname (each runner is auto-labelled with its hostname by the playbook).
 
@@ -109,7 +111,7 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `circulo-parameters.test.ts` | Read/write individual parameters on the Circulo 7 |
 | `circulo-config.test.ts` | `save-config`, `load-config`, and parameter restore on the Circulo 7 |
 | `offset-detection.test.ts` | Full offset detection run on the Integro-60 |
-| `device-files.test.ts` | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths |
+| `circulo-files.test.ts` | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths |
 | `circulo-profiles.test.ts` | Position profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
 
 ```bash
