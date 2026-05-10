@@ -81,8 +81,8 @@ Use `run-ci.sh` to dispatch the workflow with specific image versions:
 ./run-ci.sh <mm_version> <mm_api_version> [test_filter]
 
 # Examples:
-./run-ci.sh v5.4.1-flatbot.16 v0.0.389           # run all tests
-./run-ci.sh v5.4.1-flatbot.16 v0.0.389 offset     # run tests matching "offset"
+./run-ci.sh v5.4.1-flatbot.16 v0.0.390            # run all tests
+./run-ci.sh v5.4.1-flatbot.16 v0.0.390 offset     # run tests matching "offset"
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.
@@ -112,7 +112,7 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `circulo-config.test.ts` | `save-config`, `load-config`, and parameter restore on the Circulo 7 |
 | `offset-detection.test.ts` | Full offset detection run on the Integro-60 |
 | `circulo-files.test.ts` | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths |
-| `circulo-profiles.test.ts` | Position profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
+| `circulo-profiles.test.ts` | Position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
 
 ```bash
 npm run test:watch   # re-run on file changes

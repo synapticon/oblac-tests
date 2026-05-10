@@ -8,8 +8,8 @@ on:
         default: "v5.4.1-flatbot.16"
         required: false
       mm_api_version:
-        description: "Motion Master API image tag (e.g. v0.0.389)"
-        default: "v0.0.389"
+        description: "Motion Master API image tag (e.g. v0.0.390)"
+        default: "v0.0.390"
         required: false
       test_filter:
         description: "Test file/pattern to run (empty = all tests)"

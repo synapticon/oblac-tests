@@ -13,7 +13,7 @@
     "check": "biome check --write ."
   },
   "dependencies": {
-    "motion-master-client": "^0.0.389",
+    "motion-master-client": "^0.0.390",
     "rxjs": "^7.8.2",
     "ws": "^8.20.0"
   },

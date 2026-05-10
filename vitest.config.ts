@@ -13,7 +13,7 @@ export default defineConfig({
       'tests/circulo-parameters.test.ts',
       'tests/circulo-files.test.ts',
       'tests/circulo-config.test.ts',
-      // 'tests/circulo-profiles.test.ts',
+      'tests/circulo-profiles.test.ts',
       'tests/offset-detection.test.ts',
     ],
     // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs

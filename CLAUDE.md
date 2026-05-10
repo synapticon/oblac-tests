@@ -17,7 +17,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
   - `offset-detection.test.ts` — full offset detection run on the Integro-60
   - `circulo-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
-  - `circulo-profiles.test.ts` — position profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
+  - `circulo-profiles.test.ts` — position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
 - **`devices/`** — per-device fixture files, one subdirectory per serial number (e.g. `devices/8612-02-0001553-2341/`); each contains `config.csv` (saved parameter set loaded by `circulo-config.test.ts`), `.hardware_description`, and optional `.factory_config` / `.safety_parameters_report`
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
 - **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. `play.sh` prompts for the BECOME password and forwards any extra arguments to `ansible-playbook` (`./provision/play.sh -e rustdesk_password=foo`, `./provision/play.sh --tags actions-runner`, etc.). Three roles:
@@ -52,7 +52,7 @@ Key variables (see `.env.example` for full list):
 | Variable | Default | Description |
 |---|---|---|
 | `MM_VERSION` | `v5.4.1-flatbot.16` | Motion Master image tag |
-| `MM_API_VERSION` | `v0.0.389` | Motion Master API image tag |
+| `MM_API_VERSION` | `v0.0.390` | Motion Master API image tag |
 | `MM_MAC` | *(required)* | EtherCAT network interface MAC |
 | `MM_DRV` | `soem` | EtherCAT driver (`soem` or `rtsoem`) |
 | `MM_API_PORT` | `63526` | HTTP API port |
@@ -73,4 +73,4 @@ Key variables (see `.env.example` for full list):
 - `mm-api.ts` is generated — regenerate with `npm run generate:api` after the swagger spec changes.
 - Test output is tagged: `[req]` for outgoing HTTP requests to the Motion Master gateway, `[psu]` for PSU controller calls, `[srv]` for streamed `motion-master` container logs, `[api]` for streamed `motion-master-api` container logs.
 - PSU is powered on once in `globalSetup` (after the readiness gate) and powered off in teardown — tests should not call `psu.on()`/`psu.off()` themselves, since power-cycling forces EtherCAT re-enumeration and risks losing slaves mid-suite.
-- The Motion Master gateway honours a server-side `request-timeout` query parameter on every endpoint, but the generated client only types it on a few (e.g. `getDevices`). The generated method's third `params` arg is spread *after* the typed `query`, so adding `query` there overrides it at runtime — the catch is `RequestParams` deliberately Omits `query`, so TypeScript needs an `as any` cast. Example: `runOffsetDetection(serial, undefined, { query: { 'request-timeout': 240_000 } } as any)`.
+- The Motion Master gateway honours a server-side `request-timeout` query parameter on every endpoint, but the generated client only types it on a few (e.g. `getDevices`). The generated method's third `params` arg is spread *after* the typed `query`, so a `params.query` **replaces** (does not merge with) the typed one — and `RequestParams` deliberately Omits `query`, so TypeScript needs an `as unknown as RequestParams` cast. For endpoints with no other typed query params (e.g. `runOffsetDetection`), you can pass `request-timeout` in isolation: `runOffsetDetection(serial, undefined, { query: { 'request-timeout': 240_000 } } as unknown as RequestParams)`. For endpoints **with** typed query params (e.g. `runPositionProfile`, `runVelocityProfile`, `runTorqueProfile`), pass `undefined` for the typed query and put everything — including `request-timeout` — in `params.query`; otherwise the typed params are silently dropped and the call falls back to server defaults (e.g. `skip-quick-stop=true`, returns immediately). See `tests/circulo-profiles.test.ts` for the pattern.
