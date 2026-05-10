@@ -66,7 +66,7 @@ async function connectToMotionMaster(timeoutMs = 120_000): Promise<void> {
   while (Date.now() < deadline) {
     try {
       const res = await api.connect.connect();
-      console.log('Connected to Motion Master', res);
+      console.log('Connected to Motion Master', await res.json());
       return;
     } catch (e) {
       const err = e as { status?: number; error?: { message?: string } };
