@@ -99,7 +99,7 @@ npm install
 npm test
 ```
 
-Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
+Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 12 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
 
 | Test file | What it covers |
 | --- | --- |
@@ -123,8 +123,10 @@ Each line is prefixed with its source so HTTP traffic and container logs interle
 | ------- | ------------------------------------------------------------------------- |
 | `[req]` | Outgoing HTTP request from the test process (`method url → status (Xms)`) |
 | `[psu]` | HTTP call to the P1535 PSU controller                                     |
-| `[mm]`  | Streamed stdout/stderr from the `motion-master` container                 |
+| `[srv]` | Streamed stdout/stderr from the `motion-master` container                 |
 | `[api]` | Streamed stdout/stderr from the `motion-master-api` container             |
+
+Locally both `[srv]` and `[api]` stream by default. On CI `[srv]` is opt-in (set `STREAM_MM_LOGS=true` to enable). Either stream can be silenced with `STREAM_MM_LOGS=false` / `STREAM_API_LOGS=false`.
 
 Per-test and per-hook timeout is 5 min; teardown timeout is 60 s. Configurable in `vitest.config.ts`.
 

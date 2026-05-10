@@ -111,10 +111,13 @@ export async function setup() {
     });
     execSync('docker compose up -d', { stdio: 'inherit' });
   }
-  if (process.env.STREAM_MM_LOGS === 'true') {
-    streamContainerLogs('motion-master', 'mm');
+  const isCI = !!process.env.CI;
+  const streamMm = isCI ? process.env.STREAM_MM_LOGS === 'true' : process.env.STREAM_MM_LOGS !== 'false';
+  const streamApi = process.env.STREAM_API_LOGS !== 'false';
+  if (streamMm) {
+    streamContainerLogs('motion-master', 'srv');
   }
-  if (process.env.STREAM_API_LOGS !== 'false') {
+  if (streamApi) {
     streamContainerLogs('motion-master-api', 'api');
   }
   console.log('Waiting 3 s for containers to start...');
@@ -122,8 +125,8 @@ export async function setup() {
   await waitForApi();
   await connectToMotionMaster();
   await psu.on();
-  console.log('Waiting 10 s for Motion Master to enumerate and configure devices...');
-  await resolveAfter(10_000);
+  console.log('Waiting 12 s for Motion Master to enumerate and configure devices...');
+  await resolveAfter(12_000);
   await waitForDevices();
 }
 
