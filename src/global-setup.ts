@@ -49,6 +49,7 @@ async function waitForDevices(timeoutMs = 90_000, pollTimeoutMs = 2_000): Promis
     } catch (e) {
       lastError = e;
     }
+    await resolveAfter(1_000);
   }
   const suffix =
     lastError && typeof lastError === 'object' && 'error' in lastError

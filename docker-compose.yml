@@ -11,7 +11,7 @@ services:
       MM_PUB_SUB_PORT: "${MM_PUB_SUB_PORT:-63525}"
       MM_IPS: "${MM_IPS:-}"
       MM_PDO_MODE: "${MM_PDO_MODE:-monitor}"
-    restart: unless-stopped
+    restart: "no"
 
   motion-master-api:
     image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.389}
@@ -21,4 +21,4 @@ services:
       - motion-master
     environment:
       PORT: "${MM_API_PORT:-63526}"
-    restart: unless-stopped
+    restart: "no"

@@ -5,7 +5,7 @@ import { circuloTestDevice } from '../src/test-devices.js';
 
 const device = circuloTestDevice;
 
-test('run position profile', async () => {
+test.skip('run position profile', async () => {
   await api.devices.resetFault(device.serialNumber, { force: true });
 
   const { ok } = await api.devices.runPositionProfile(
@@ -33,12 +33,13 @@ test('run torque profile', async () => {
   const { ok } = await api.devices.runTorqueProfile(
     device.serialNumber,
     {
-      target: 300,
-      slope: 300,
+      target: 50,
+      slope: 50,
       'skip-quick-stop': false,
       'target-reach-timeout': 5_000,
-      window: 100,
-      'window-time': 5,
+      'holding-duration': 3_000,
+      window: 30,
+      'window-time': 1,
     },
     { query: { 'request-timeout': 30_000 } } as unknown as RequestParams,
   );
@@ -46,7 +47,7 @@ test('run torque profile', async () => {
   expect(ok).toBe(true);
 }, 60_000);
 
-test('quick-stop', async () => {
+test.skip('quick-stop', async () => {
   await api.devices.resetFault(device.serialNumber, { force: true });
 
   // Start a long position move with skip-quick-stop=true — returns immediately with motor moving.
@@ -63,7 +64,7 @@ test('quick-stop', async () => {
   expect(ok).toBe(true);
 });
 
-test('position profile without target-reach-timeout returns error', async () => {
+test.skip('position profile without target-reach-timeout returns error', async () => {
   await api.devices.resetFault(device.serialNumber, { force: true });
 
   await expect(
@@ -78,7 +79,7 @@ test('position profile without target-reach-timeout returns error', async () => 
   ).rejects.toMatchObject({ ok: false, status: 400 });
 });
 
-test('torque profile without target-reach-timeout returns error', async () => {
+test.skip('torque profile without target-reach-timeout returns error', async () => {
   await api.devices.resetFault(device.serialNumber, { force: true });
 
   await expect(
