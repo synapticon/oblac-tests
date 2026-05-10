@@ -93,6 +93,8 @@ cp .env.example .env
 npm install
 ```
 
+`.env` is what Docker Compose reads — `.env.example` is just a committed template. To pick up version bumps in the template, copy them into your local `.env` and `docker compose pull` to fetch the new images before the next test run.
+
 ## Running tests
 
 ```bash

@@ -12,7 +12,7 @@ export default defineConfig({
       'tests/system.test.ts',
       'tests/offset-detection.test.ts',
       'tests/circulo-parameters.test.ts',
-      // 'tests/circulo-config.test.ts',
+      'tests/circulo-config.test.ts',
       // 'tests/device-files.test.ts',
       // 'tests/circulo-profiles.test.ts',
     ],

@@ -45,13 +45,13 @@ Dispatch CI with specific image versions:
 
 ## Environment
 
-Copy `.env.example` to `.env` and fill in at minimum `MM_MAC` (EtherCAT interface MAC address).
+Copy `.env.example` to `.env` and fill in at minimum `MM_MAC` (EtherCAT interface MAC address). Docker Compose reads `.env` (not `.env.example`); changes to the template are only picked up after copying them into the local `.env`.
 
 Key variables (see `.env.example` for full list):
 
 | Variable | Default | Description |
 |---|---|---|
-| `MM_VERSION` | `v5.4.1-flatbot.12` | Motion Master image tag |
+| `MM_VERSION` | `v5.4.1-flatbot.16` | Motion Master image tag |
 | `MM_API_VERSION` | `v0.0.389` | Motion Master API image tag |
 | `MM_MAC` | *(required)* | EtherCAT network interface MAC |
 | `MM_DRV` | `soem` | EtherCAT driver (`soem` or `rtsoem`) |
