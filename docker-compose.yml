@@ -1,6 +1,6 @@
 services:
   motion-master:
-    image: synapticon/motion-master:${MM_VERSION:-v5.4.1-flatbot.16}
+    image: synapticon/motion-master:${MM_VERSION:-v5.4.1-flatbot.18}
     container_name: motion-master
     network_mode: host
     privileged: true

@@ -50,14 +50,14 @@ Copy `.env.example` to `.env` and fill in at minimum `MM_MAC` (EtherCAT interfac
 
 Key variables (see `.env.example` for full list):
 
-| Variable | Default | Description |
-|---|---|---|
-| `MM_VERSION` | `v5.4.1-flatbot.16` | Motion Master image tag |
-| `MM_API_VERSION` | `v0.0.390` | Motion Master API image tag |
-| `MM_MAC` | *(required)* | EtherCAT network interface MAC |
-| `MM_DRV` | `soem` | EtherCAT driver (`soem` or `rtsoem`) |
-| `MM_API_PORT` | `63526` | HTTP API port |
-| `PSU_URL` | `http://192.168.212.103` | ESP32 PSU controller base URL |
+| Variable         | Default                  | Description                          |
+| ---------------- | ------------------------ | ------------------------------------ |
+| `MM_VERSION`     | `v5.4.1-flatbot.18`      | Motion Master image tag              |
+| `MM_API_VERSION` | `v0.0.390`               | Motion Master API image tag          |
+| `MM_MAC`         | _(required)_             | EtherCAT network interface MAC       |
+| `MM_DRV`         | `soem`                   | EtherCAT driver (`soem` or `rtsoem`) |
+| `MM_API_PORT`    | `63526`                  | HTTP API port                        |
+| `PSU_URL`        | `http://192.168.212.103` | ESP32 PSU controller base URL        |
 
 ## Code style
 
@@ -74,4 +74,4 @@ Key variables (see `.env.example` for full list):
 - `mm-api.ts` is generated — regenerate with `npm run generate:api` after the swagger spec changes.
 - Test output is tagged: `[req]` for outgoing HTTP requests to the Motion Master gateway, `[psu]` for PSU controller calls, `[srv]` for streamed `motion-master` container logs, `[api]` for streamed `motion-master-api` container logs.
 - PSU is powered on once in `globalSetup` (after the readiness gate) and powered off in teardown — tests should not call `psu.on()`/`psu.off()` themselves, since power-cycling forces EtherCAT re-enumeration and risks losing slaves mid-suite.
-- The Motion Master gateway honours a server-side `request-timeout` query parameter on every endpoint, but the generated client only types it on a few (e.g. `getDevices`). The generated method's third `params` arg is spread *after* the typed `query`, so a `params.query` **replaces** (does not merge with) the typed one — and `RequestParams` deliberately Omits `query`, so TypeScript needs an `as unknown as RequestParams` cast. For endpoints with no other typed query params (e.g. `runOffsetDetection`), you can pass `request-timeout` in isolation: `runOffsetDetection(serial, undefined, { query: { 'request-timeout': 240_000 } } as unknown as RequestParams)`. For endpoints **with** typed query params (e.g. `runPositionProfile`, `runVelocityProfile`, `runTorqueProfile`), pass `undefined` for the typed query and put everything — including `request-timeout` — in `params.query`; otherwise the typed params are silently dropped and the call falls back to server defaults (e.g. `skip-quick-stop=true`, returns immediately). See `tests/circulo-profiles.test.ts` for the pattern.
+  - The Motion Master gateway honours a server-side `request-timeout` query parameter on every endpoint, but the generated client only types it on a few (e.g. `getDevices`). The generated method's third `params` arg is spread _after_ the typed `query`, so a `params.query` **replaces** (does not merge with) the typed one — and `RequestParams` deliberately Omits `query`, so TypeScript needs an `as unknown as RequestParams` cast. For endpoints with no other typed query params (e.g. `runOffsetDetection`), you can pass `request-timeout` in isolation: `runOffsetDetection(serial, undefined, { query: { 'request-timeout': 240_000 } } as unknown as RequestParams)`. For endpoints **with** typed query params (e.g. `runPositionProfile`, `runVelocityProfile`, `runTorqueProfile`), pass `undefined` for the typed query and put everything — including `request-timeout` — in `params.query`; otherwise the typed params are silently dropped and the call falls back to server defaults (e.g. `skip-quick-stop=true`, returns immediately). See `tests/circulo-profiles.test.ts` for the pattern.

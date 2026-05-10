@@ -81,8 +81,8 @@ Use `run-ci.sh` to dispatch the workflow with specific image versions:
 ./run-ci.sh <mm_version> <mm_api_version> [test_filter]
 
 # Examples:
-./run-ci.sh v5.4.1-flatbot.16 v0.0.390            # run all tests
-./run-ci.sh v5.4.1-flatbot.16 v0.0.390 offset     # run tests matching "offset"
+./run-ci.sh v5.4.1-flatbot.18 v0.0.390           # run all tests
+./run-ci.sh v5.4.1-flatbot.18 v0.0.390 offset     # run tests matching "offset"
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.
@@ -105,15 +105,15 @@ npm test
 
 Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
 
-| Test file | What it covers |
-| --- | --- |
-| `system.test.ts` | MM client/system version, device enumeration |
-| `circulo-parameters.test.ts` | Read/write individual parameters on the Circulo 7 |
-| `circulo-config.test.ts` | `save-config`, `load-config`, and parameter restore on the Circulo 7 |
-| `offset-detection.test.ts` | Full offset detection run on the Integro-60 |
-| `circulo-files.test.ts` | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths |
-| `circulo-profiles.test.ts` | Position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
-| `circulo-smm.test.ts` | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart |
+| Test file                    | What it covers                                                                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `system.test.ts`             | MM client/system version, device enumeration                                                                                        |
+| `circulo-parameters.test.ts` | Read/write individual parameters on the Circulo 7                                                                                   |
+| `circulo-config.test.ts`     | `save-config`, `load-config`, and parameter restore on the Circulo 7                                                                |
+| `offset-detection.test.ts`   | Full offset detection run on the Integro-60                                                                                         |
+| `circulo-files.test.ts`      | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths   |
+| `circulo-profiles.test.ts`   | Position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
+| `circulo-smm.test.ts`        | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart                                       |
 
 ```bash
 npm run test:watch   # re-run on file changes
