@@ -127,7 +127,7 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `integro-offset-detection.test.ts` | Full offset detection run on the Integro-60                                                                                    |
 | `circulo-offset-detection.test.ts` | Full offset detection run on the Circulo 7                                                                                     |
 | `circulo-files.test.ts`      | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths   |
-| `circulo-profiles.test.ts`   | Position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
+| `circulo-profiles.test.ts`   | Position profile, velocity profile, torque profile (1 s post-torque wait to let the drive leave CiA 402 QUICK_STOP_ACTIVE), and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
 | `circulo-smm.test.ts`        | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart                                       |
 
 ```bash
