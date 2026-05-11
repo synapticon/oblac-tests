@@ -30,7 +30,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   `group_vars/all.yml` derives `username`/`home_dir` from `lookup('env', 'USER')` / `lookup('env', 'HOME')` — **not** from `ansible_facts`. The first play declares `become: true`, so gather_facts runs escalated and `ansible_facts['user_id']`/`ansible_facts['env']['HOME']` resolve to `root`/`/root`. Reverting to the `ansible_facts` form silently lands every role's user-home writes (psu scripts, the deb cache, etc.) under `/root/`.
   - `actions-runner` — registers the machine as a self-hosted GitHub Actions runner for `synapticon/oblac-tests` and installs the runner as a systemd service. Idempotent (skips if `~/actions-runner/.runner` exists). Requires `gh auth login` first; fetches the registration token at runtime via `gh api`.
 - **`docker-compose.yml`** — runs `synapticon/motion-master` and `synapticon/motion-master-api` containers
-- **`.github/workflows/test.yml`** — `workflow_dispatch`-only CI; targets `runs-on: [self-hosted, OptiPlex-3080]` (the test machine's hostname-derived label)
+- **`.github/workflows/test.yml`** — `workflow_dispatch`-only CI; targets `runs-on: [self-hosted, OptiPlex-3080]` (the test machine's hostname-derived label). Inputs: `mm_version`, `mm_api_version`, `file_filter` (vitest file path pattern), `test_name_filter` (vitest `-t` pattern), `stream_api_logs` (default `true`), `stream_mm_logs` (default `false`). Use `run-workflow.sh` to dispatch.
 
 ## Commands
 
@@ -47,7 +47,7 @@ npm run check         # lint + format with Biome (auto-fix)
 Dispatch CI with specific image versions:
 
 ```bash
-./run-ci.sh <mm_version> <mm_api_version> [test_filter]
+./run-workflow.sh --mm_version=<tag> --mm_api_version=<tag> [--file_filter=<pattern>] [--test_name_filter=<name>] [--stream_api_logs=<bool>] [--stream_mm_logs=<bool>]
 ```
 
 ## Environment

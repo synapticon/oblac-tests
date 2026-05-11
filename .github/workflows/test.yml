@@ -4,15 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       mm_version:
-        description: "Motion Master image tag (e.g. v5.4.1-flatbot.18)"
+        description: "Motion Master image tag"
         default: "v5.4.1-flatbot.18"
         required: false
       mm_api_version:
-        description: "Motion Master API image tag (e.g. v0.0.390)"
+        description: "Motion Master API image"
         default: "v0.0.390"
         required: false
-      test_filter:
-        description: "Test file/pattern to run (empty = all tests)"
+      file_filter:
+        description: "File path pattern to run (e.g. integro, circulo)"
+        default: ""
+        required: false
+      test_name_filter:
+        description: "Test name pattern to run (-t flag, e.g. offset)"
         default: ""
         required: false
       stream_api_logs:
@@ -59,11 +63,10 @@ jobs:
 
       - name: Run tests
         run: |
-          if [ -n "${{ inputs.test_filter }}" ]; then
-            npx vitest run ${{ inputs.test_filter }}
-          else
-            npx vitest run
-          fi
+          CMD="npx vitest run"
+          [ -n "${{ inputs.file_filter }}" ] && CMD="$CMD ${{ inputs.file_filter }}"
+          [ -n "${{ inputs.test_name_filter }}" ] && CMD="$CMD -t '${{ inputs.test_name_filter }}'"
+          $CMD
 
       - name: Upload test results
         if: always()

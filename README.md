@@ -75,14 +75,23 @@ The CI workflow (`.github/workflows/test.yml`) is `workflow_dispatch`-only and t
 
 ## Triggering CI
 
-Use `run-ci.sh` to dispatch the workflow with specific image versions:
+Use `run-workflow.sh` to dispatch the workflow with specific image versions:
 
 ```bash
-./run-ci.sh <mm_version> <mm_api_version> [test_filter]
+./run-workflow.sh --mm_version=<tag> --mm_api_version=<tag> [options]
+
+# Options:
+#   --file_filter=<pattern>    File path pattern passed to vitest (e.g. integro, circulo)
+#   --test_name_filter=<name>  Test name pattern passed to vitest -t (e.g. offset)
+#   --stream_api_logs=<bool>   Stream motion-master-api logs (default: true)
+#   --stream_mm_logs=<bool>    Stream motion-master logs (default: false)
 
 # Examples:
-./run-ci.sh v5.4.1-flatbot.18 v0.0.390           # run all tests
-./run-ci.sh v5.4.1-flatbot.18 v0.0.390 offset     # run tests matching "offset"
+./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390
+./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --file_filter=integro
+./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --test_name_filter=offset
+./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --file_filter=circulo --test_name_filter=offset
+./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --stream_mm_logs=true
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.
@@ -100,7 +109,10 @@ npm install
 ## Running tests
 
 ```bash
-npm test
+npm test                          # run all tests
+npm test -- integro               # run files matching "integro"
+npm test -- -t "offset"          # run tests whose name matches "offset"
+npm test -- circulo -t "offset"  # combine file and test name filter
 ```
 
 Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
