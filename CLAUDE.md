@@ -14,12 +14,13 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
 - **`tests/`** — Vitest test files; all tests run sequentially (multiple devices attached)
   - `system.test.ts` — MM client/system version, device enumeration
   - `circulo-parameters.test.ts` — read/write individual parameters on the Circulo 7 (get-parameter-values, set-parameter-values, upload, download)
-  - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
-  - `integro-offset-detection.test.ts` — full offset detection run on the Integro-60
-  - `circulo-offset-detection.test.ts` — full offset detection run on the Circulo 7
   - `circulo-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
+  - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
   - `circulo-profiles.test.ts` — position profile, velocity profile, torque profile (1 s post-torque settlement after `skip-quick-stop=false` — lets the drive leave CiA 402 QUICK_STOP_ACTIVE before the next test), and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
+  - `circulo-offset-detection.test.ts` — full offset detection run on the Circulo 7
+  - `circulo-system-identification.test.ts` — system identification on the Circulo 7: deletes any existing `plant_model.csv`, runs the chirp signal via `start-system-identification`, verifies the file was created, downloads and parses it with `parsePlantModelCsv` from `motion-master-client`
   - `circulo-smm.test.ts` — SMM (Safe Motion Module) OS commands on the Circulo 7 via `run-os-command`: read SMM firmware version (command `11,13,1,…`, `read-fs-buffer=true`, parsed as `v{fsBuffer[1]}.{fsBuffer[0]}`) and SMM restart (command `11,15,…`)
+  - `integro-offset-detection.test.ts` — full offset detection run on the Integro-60
 - **`devices/`** — per-device fixture files, one subdirectory per serial number (e.g. `devices/8612-02-0001553-2341/`); each contains `config.csv` (saved parameter set loaded by `circulo-config.test.ts`), `.hardware_description`, and optional `.factory_config` / `.safety_parameters_report`
 - **`p1535/`** — ESP32-IDF firmware for the P1535 PSU HTTP controller
 - **`provision/`** — Ansible playbook + bootstrap script for Ubuntu 26.04 LTS test machines. `play.sh` prompts for the BECOME password and forwards any extra arguments to `ansible-playbook` (`./provision/play.sh -e rustdesk_password=foo`, `./provision/play.sh --tags actions-runner`, etc.). Four roles:
