@@ -5,13 +5,13 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
 ## Architecture
 
 - **`src/`** — shared test infrastructure
-  - `global-setup.ts` — Vitest global setup/teardown: starts Docker services, streams `motion-master` and `motion-master-api` container stdout/stderr to the test output (locally both stream by default; on CI `motion-master` is opt-in via `STREAM_MM_LOGS=true`), waits 3 s for containers to come up, waits for the MM API, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, then polls `GET /devices` until enumeration succeeds. Teardown powers off the PSU.
+  - `global-setup.ts` — Vitest global setup/teardown: starts Docker services, streams `motion-master` and `motion-master-api` container stdout/stderr to the test output (locally both stream by default; on CI `motion-master` is opt-in via `STREAM_MM_LOGS=true`), waits 3 s for containers to come up, waits for the MM API, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, then polls `GET /devices` until enumeration succeeds. Teardown powers off the PSU, kills log-streaming processes, and (on CI) runs `docker compose down`.
   - `setup.ts` — per-test exports: `api` (Motion Master HTTP client) and `psu` (PSU power control)
-  - `test-devices.ts` — defines the `TestDevice` interface (`position`, `serialNumber`, `name`, `productName`) and exports named constants for each physical device on the rig (`nodeTestDevice`, `integroTestDevice`, `circuloTestDevice`). `name` is a short label used in test names (e.g. `'circulo'`, `'integro'`, `'node'`); `productName` is the full human-readable product name.
+  - `test-devices.ts` — defines the `TestDevice` interface (`position`, `serialNumber`, `name`, `productName`) and exports a `testDevices` ordered array plus named constants for each physical device on the rig (`nodeTestDevice`, `integroTestDevice`, `circuloTestDevice`). `name` is a short label used in test names (e.g. `'circulo'`, `'integro'`, `'node'`); `productName` is the full human-readable product name. Tests select a specific device by serial number.
   - `psu.ts` — HTTP client for the ESP32 PSU controller (`PSU_URL`)
   - `log-fetch.ts` — wraps `fetch` to log method/URL/status/duration with a `[req]` prefix; used by `api` and `psu` so every endpoint call appears in the test output
   - `mm-api.ts` — generated TypeScript client from the Motion Master OpenAPI spec (do not edit by hand)
-- **`tests/`** — Vitest test files; all tests run sequentially (single device attached)
+- **`tests/`** — Vitest test files; all tests run sequentially (multiple devices attached)
   - `system.test.ts` — MM client/system version, device enumeration
   - `circulo-parameters.test.ts` — read/write individual parameters on the Circulo 7 (get-parameter-values, set-parameter-values, upload, download)
   - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
@@ -39,6 +39,8 @@ npm run test:watch    # watch mode
 npm run test:ui       # Vitest browser UI
 npm run typecheck     # tsc --noEmit
 npm run generate:api  # regenerate mm-api.ts from the live swagger spec
+npm run format        # format with Biome
+npm run check         # lint + format with Biome (auto-fix)
 ```
 
 Dispatch CI with specific image versions:
@@ -65,12 +67,14 @@ Key variables (see `.env.example` for full list):
 ## Code style
 
 - Semicolons always.
+- Single quotes for strings.
 - Curly braces always on control-flow bodies.
 - No comments unless the WHY is non-obvious.
+- Biome (`biome.json`) enforces formatting and linting — run `npm run check` to auto-fix.
 
 ## Notes
 
-- Tests run sequentially (`pool: forks`, `singleFork: true`) — only one device is connected.
+- Tests run sequentially (`pool: forks`, `singleFork: true`) — multiple devices are connected but tests target specific ones.
 - Global timeout is 5 min per test and per hook; teardown is 60 s.
 - Reporter is `verbose` locally and `['basic', 'github-actions']` on CI (gated on `GITHUB_ACTIONS`). `verbose` redraws the test tree on every stdout write so the streamed `[srv]`/`[api]` lines cause the tree to reprint repeatedly — accepted as noise locally for the per-test detail; CI uses `basic` for a clean linear log plus `github-actions` for inline failure annotations.
 - On CI, `docker compose down` is called in teardown. Locally, containers are left running.

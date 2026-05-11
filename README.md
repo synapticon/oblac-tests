@@ -2,13 +2,13 @@
 
 Hardware-in-the-loop integration tests for [Motion Master](https://github.com/synapticon/oblac) / SOMANET devices.
 
-Tests run against a real device connected via EtherCAT. Motion Master and its HTTP API are started automatically in Docker before the test suite runs.
+Tests run against real SOMANET devices connected via EtherCAT. Motion Master and its HTTP API are started automatically in Docker before the test suite runs.
 
 ## Requirements
 
 - Docker (with Compose v2)
 - Node.js ≥ 22
-- A SOMANET device reachable via EtherCAT
+- SOMANET devices reachable via EtherCAT
 - _(optional)_ A P1535 PSU controller on the local network
 
 ## Provisioning a test machine
@@ -118,6 +118,7 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 ```bash
 npm run test:watch   # re-run on file changes
 npm run test:ui      # browser UI at http://localhost:51204
+npm run check        # lint + format with Biome (auto-fix)
 ```
 
 ### Test output
