@@ -73,7 +73,7 @@ The playbook prints the machine's RustDesk ID at the end of every run (via `rust
 
 The CI workflow (`.github/workflows/test.yml`) is `workflow_dispatch`-only and targets `runs-on: [self-hosted, OptiPlex-3080]`. To target a different machine, change the second label to that machine's hostname (each runner is auto-labelled with its hostname by the playbook).
 
-## Triggering CI
+## Run Workflow
 
 Use `run-workflow.sh` to dispatch the workflow with specific image versions:
 
@@ -81,7 +81,9 @@ Use `run-workflow.sh` to dispatch the workflow with specific image versions:
 ./run-workflow.sh --mm_version=<tag> --mm_api_version=<tag> [options]
 
 # Options:
-#   --file_filter=<pattern>    File path pattern passed to vitest (e.g. integro, circulo)
+#   --mm_version=<tag>         Motion Master image tag, e.g. v5.4.1-flatbot.18
+#   --mm_api_version=<tag>     Motion Master API image tag, e.g. v0.0.390
+#   --file_filter=<pattern>    File path pattern passed to vitest (e.g. integro)
 #   --test_name_filter=<name>  Test name pattern passed to vitest -t (e.g. offset)
 #   --stream_api_logs=<bool>   Stream motion-master-api logs (default: true)
 #   --stream_mm_logs=<bool>    Stream motion-master logs (default: false)

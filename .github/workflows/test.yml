@@ -16,7 +16,7 @@ on:
         default: ""
         required: false
       test_name_filter:
-        description: "Test name pattern to run (-t flag, e.g. offset)"
+        description: "Test name pattern to run (-t flag, e.g. offset-detection)"
         default: ""
         required: false
       stream_api_logs:
