@@ -5,6 +5,7 @@
   roles:
     - test-machine
     - rustdesk
+    - oblac-drives-releases
 
 - name: Set up test environment
   hosts: local

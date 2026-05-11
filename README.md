@@ -19,7 +19,7 @@ The target platform is **Ubuntu 26.04 LTS**. To provision a fresh machine:
 bash <(curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh)
 ```
 
-This installs Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`, VS Code, and RustDesk, clones the repository, runs `npm install`, creates `.env` from `.env.example`, and registers the machine as a self-hosted GitHub Actions runner for the repo.
+This installs Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`, VS Code, and RustDesk, clones the repository, runs `npm install`, creates `.env` from `.env.example`, caches available `oblac-drives` Debian packages to `~/oblac-drives-releases/`, and registers the machine as a self-hosted GitHub Actions runner for the repo.
 
 The runner registration step requires `gh` to be authenticated with admin permission on `synapticon/oblac-tests`. The first run will fail at that step on a fresh machine (since `gh` is installed by the playbook itself); after the failure, run:
 

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Sync available oblac-drives Debian packages from the CDN to a local directory.
+# Skips releases that don't publish a .deb and reuses files already on disk.
+# Requires: bash, curl, and either jq or python3.
+#
+# Overridable via env vars: OBLAC_DRIVES_RELEASES_URL, OBLAC_DRIVES_RELEASES_BASE_URL,
+# OBLAC_DRIVES_RELEASES_DIR.
+
+set -euo pipefail
+
+MANIFEST_URL="${OBLAC_DRIVES_RELEASES_URL:-https://d9k1r8ajdoczx.cloudfront.net/oblac-drives-releases.json}"
+BASE_URL="${OBLAC_DRIVES_RELEASES_BASE_URL:-https://d9k1r8ajdoczx.cloudfront.net/brands/a7e925fa-57b7-4741-9126-0840a63cdb71/releases}"
+TARGET_DIR="${OBLAC_DRIVES_RELEASES_DIR:-$HOME/oblac-drives-releases}"
+
+mkdir -p "$TARGET_DIR"
+
+parse_versions() {
+  if command -v jq >/dev/null 2>&1; then
+    jq -r '.[].version'
+  elif command -v python3 >/dev/null 2>&1; then
+    python3 -c 'import json, sys
+for r in json.load(sys.stdin):
+    print(r["version"])'
+  else
+    echo "error: need jq or python3 to parse the releases manifest" >&2
+    exit 1
+  fi
+}
+
+versions=$(curl -fsSL "$MANIFEST_URL" | parse_versions)
+
+for v in $versions; do
+  filename="oblac-drives_${v}_amd64.deb"
+  dest="$TARGET_DIR/$filename"
+  if [[ -f "$dest" ]]; then
+    continue
+  fi
+  url="$BASE_URL/$filename"
+  status=$(curl -sI -o /dev/null -w '%{http_code}' "$url")
+  if [[ "$status" != "200" ]]; then
+    echo "skip $v (HTTP $status)"
+    continue
+  fi
+  echo "download $v"
+  curl -fsSL "$url" -o "$dest.tmp"
+  mv "$dest.tmp" "$dest"
+done

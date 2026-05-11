@@ -11,8 +11,8 @@ test('run position profile', async () => {
 
   const { ok } = await api.devices.runPositionProfile(device.serialNumber, undefined, {
     query: {
-      target: 40_894_464,
-      velocity: 1_000,
+      target: 43_692,
+      velocity: 2_000,
       acceleration: 5_000,
       deceleration: 5_000,
       relative: true,
@@ -32,12 +32,12 @@ test('run velocity profile', async () => {
 
   const { ok } = await api.devices.runVelocityProfile(device.serialNumber, undefined, {
     query: {
-      target: 100,
+      target: -3_000,
       acceleration: 5_000,
       deceleration: 5_000,
       'skip-quick-stop': false,
-      'target-reach-timeout': 5_000,
-      'holding-duration': 3_000,
+      'target-reach-timeout': 30_000,
+      'holding-duration': 2_000,
       window: 10,
       'window-time': 1,
       'request-timeout': 30_000,
@@ -52,10 +52,10 @@ test('run torque profile', async () => {
 
   const { ok } = await api.devices.runTorqueProfile(device.serialNumber, undefined, {
     query: {
-      target: 50,
+      target: 150,
       slope: 50,
       'skip-quick-stop': false,
-      'target-reach-timeout': 5_000,
+      'target-reach-timeout': 30_000,
       'holding-duration': 3_000,
       window: 30,
       'window-time': 1,
@@ -72,8 +72,8 @@ test('quick-stop', async () => {
   // Start a long position move with skip-quick-stop=true — returns immediately with motor moving.
   await api.devices.runPositionProfile(device.serialNumber, undefined, {
     query: {
-      target: 40_894_464,
-      velocity: 1_000,
+      target: 524_288,
+      velocity: 2_000,
       acceleration: 5_000,
       deceleration: 5_000,
       relative: true,
@@ -93,8 +93,8 @@ test('position profile without target-reach-timeout returns error', async () => 
   await expect(
     api.devices.runPositionProfile(device.serialNumber, undefined, {
       query: {
-        target: 40_894_464,
-        velocity: 1_000,
+        target: 43_692,
+        velocity: 2_000,
         acceleration: 5_000,
         deceleration: 5_000,
         relative: true,
@@ -114,12 +114,12 @@ test('velocity profile without target-reach-timeout returns error', async () => 
   await expect(
     api.devices.runVelocityProfile(device.serialNumber, undefined, {
       query: {
-        target: 1_000,
+        target: -3_000,
         acceleration: 5_000,
         deceleration: 5_000,
         'skip-quick-stop': false,
         'target-reach-timeout': undefined,
-        'holding-duration': 3_000,
+        'holding-duration': 2_000,
         window: 10,
         'window-time': 1,
         'request-timeout': 30_000,
@@ -134,7 +134,7 @@ test('torque profile without target-reach-timeout returns error', async () => {
   await expect(
     api.devices.runTorqueProfile(device.serialNumber, undefined, {
       query: {
-        target: 50,
+        target: 150,
         slope: 50,
         'skip-quick-stop': false,
         'target-reach-timeout': undefined,
