@@ -63,10 +63,10 @@ jobs:
 
       - name: Run tests
         run: |
-          CMD="npx vitest run"
-          [ -n "${{ inputs.file_filter }}" ] && CMD="$CMD ${{ inputs.file_filter }}"
-          [ -n "${{ inputs.test_name_filter }}" ] && CMD="$CMD -t '${{ inputs.test_name_filter }}'"
-          $CMD
+          ARGS=()
+          [ -n "${{ inputs.file_filter }}" ] && ARGS+=("${{ inputs.file_filter }}")
+          [ -n "${{ inputs.test_name_filter }}" ] && ARGS+=("-t" "${{ inputs.test_name_filter }}")
+          npx vitest run "${ARGS[@]}"
 
       - name: Upload test results
         if: always()
