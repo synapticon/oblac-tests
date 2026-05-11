@@ -15,7 +15,8 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   - `system.test.ts` — MM client/system version, device enumeration
   - `circulo-parameters.test.ts` — read/write individual parameters on the Circulo 7 (get-parameter-values, set-parameter-values, upload, download)
   - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
-  - `offset-detection.test.ts` — full offset detection run on the Integro-60
+  - `integro-offset-detection.test.ts` — full offset detection run on the Integro-60
+  - `circulo-offset-detection.test.ts` — full offset detection run on the Circulo 7
   - `circulo-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
   - `circulo-profiles.test.ts` — position profile, velocity profile, torque profile, and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
   - `circulo-smm.test.ts` — SMM (Safe Motion Module) OS commands on the Circulo 7 via `run-os-command`: read SMM firmware version (command `11,13,1,…`, `read-fs-buffer=true`, parsed as `v{fsBuffer[1]}.{fsBuffer[0]}`) and SMM restart (command `11,15,…`)
