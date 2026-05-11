@@ -64,6 +64,10 @@ test('run torque profile', async () => {
   } as unknown as RequestParams);
 
   expect(ok).toBe(true);
+
+  // skip-quick-stop=false leaves the drive in CiA 402 QUICK_STOP_ACTIVE; give it
+  // time to settle into SWITCH_ON_DISABLED so the next test can re-enable operation.
+  await resolveAfter(1_000);
 }, 60_000);
 
 test('quick-stop', async () => {
