@@ -111,24 +111,24 @@ npm install
 ## Running tests
 
 ```bash
-npm test                          # run all tests
-npm test -- integro               # run files matching "integro"
+npm test                         # run all tests
+npm test -- integro              # run files matching "integro"
 npm test -- -t "offset"          # run tests whose name matches "offset"
 npm test -- circulo -t "offset"  # combine file and test name filter
 ```
 
 Vitest starts the Docker services, waits 3 s for the containers to come up, connects to Motion Master, powers on the PSU, waits 10 s for Motion Master to enumerate and configure devices, polls `GET /devices` until the EtherCAT bus is enumerated, then runs all tests sequentially. Teardown powers off the PSU and (on CI) tears down the containers. Tests should not call `psu.on()`/`psu.off()` themselves — power-cycling mid-suite forces re-enumeration and risks losing slaves.
 
-| Test file                    | What it covers                                                                                                                      |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `system.test.ts`             | MM client/system version, device enumeration                                                                                        |
-| `circulo-parameters.test.ts` | Read/write individual parameters on the Circulo 7                                                                                   |
-| `circulo-config.test.ts`     | `save-config`, `load-config`, and parameter restore on the Circulo 7                                                                |
-| `integro-offset-detection.test.ts` | Full offset detection run on the Integro-60                                                                                    |
-| `circulo-offset-detection.test.ts` | Full offset detection run on the Circulo 7                                                                                     |
-| `circulo-files.test.ts`      | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths   |
-| `circulo-profiles.test.ts`   | Position profile, velocity profile, torque profile (1 s post-torque wait to let the drive leave CiA 402 QUICK_STOP_ACTIVE), and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
-| `circulo-smm.test.ts`        | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart                                       |
+| Test file                          | What it covers                                                                                                                                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `system.test.ts`                   | MM client/system version, device enumeration                                                                                                                                                                |
+| `circulo-parameters.test.ts`       | Read/write individual parameters on the Circulo 7                                                                                                                                                           |
+| `circulo-config.test.ts`           | `save-config`, `load-config`, and parameter restore on the Circulo 7                                                                                                                                        |
+| `integro-offset-detection.test.ts` | Full offset detection run on the Integro-60                                                                                                                                                                 |
+| `circulo-offset-detection.test.ts` | Full offset detection run on the Circulo 7                                                                                                                                                                  |
+| `circulo-files.test.ts`            | File system operations (list, upload, download, delete) on the Circulo 7; regular and hidden files, unlock semantics, error paths                                                                           |
+| `circulo-profiles.test.ts`         | Position profile, velocity profile, torque profile (1 s post-torque wait to let the drive leave CiA 402 QUICK_STOP_ACTIVE), and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` |
+| `circulo-smm.test.ts`              | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart                                                                                                               |
 
 ```bash
 npm run test:watch   # re-run on file changes
