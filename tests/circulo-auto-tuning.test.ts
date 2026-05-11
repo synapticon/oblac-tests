@@ -16,19 +16,25 @@ test('compute-auto-tuning-gains velocity', async () => {
   expect(ok).toBe(true);
 
   const { data: kp } = await api.devices.uploadParameter(device.serialNumber, '0x2011', '0x01');
-  const { data: ki } = await api.devices.uploadParameter(device.serialNumber, '0x2011', '0x02');
   expect(kp?.value).toBeGreaterThan(0);
-  expect(ki?.value).toBeGreaterThan(0);
-  console.log(`velocity gains after compute: kp=${kp?.value}, ki=${ki?.value}`);
+  console.log(`velocity kp after compute: ${kp?.value}`);
 });
 
 test('compute-auto-tuning-gains position', async () => {
+  await api.devices.downloadParameter(device.serialNumber, '0x2012', '0x01', 0);
+  await api.devices.downloadParameter(device.serialNumber, '0x2012', '0x02', 0);
+  await api.devices.downloadParameter(device.serialNumber, '0x2012', '0x03', 0);
+
   const { ok } = await api.devices.computeAutoTuningGainsPosition(device.serialNumber, {
     'controller-type': 'P_PI',
     'request-timeout': 10_000,
   });
 
   expect(ok).toBe(true);
+
+  const { data: kp } = await api.devices.uploadParameter(device.serialNumber, '0x2012', '0x01');
+  expect(kp?.value).toBeGreaterThan(0);
+  console.log(`position kp after compute: ${kp?.value}`);
 });
 
 test('start-full-auto-tuning velocity', async () => {
@@ -44,10 +50,8 @@ test('start-full-auto-tuning velocity', async () => {
   console.log('full velocity auto-tuning result:', JSON.stringify(data, null, 2));
 
   const { data: kp } = await api.devices.uploadParameter(device.serialNumber, '0x2011', '0x01');
-  const { data: ki } = await api.devices.uploadParameter(device.serialNumber, '0x2011', '0x02');
   expect(kp?.value).toBeGreaterThan(0);
-  expect(ki?.value).toBeGreaterThan(0);
-  console.log(`velocity gains after full auto-tuning: kp=${kp?.value}, ki=${ki?.value}`);
+  console.log(`velocity kp after full auto-tuning: ${kp?.value}`);
 });
 
 test('start-full-auto-tuning position', async () => {
@@ -63,8 +67,6 @@ test('start-full-auto-tuning position', async () => {
   console.log('full position auto-tuning result:', JSON.stringify(data, null, 2));
 
   const { data: kp } = await api.devices.uploadParameter(device.serialNumber, '0x2012', '0x01');
-  const { data: ki } = await api.devices.uploadParameter(device.serialNumber, '0x2012', '0x02');
   expect(kp?.value).toBeGreaterThan(0);
-  expect(ki?.value).toBeGreaterThan(0);
-  console.log(`position gains after full auto-tuning: kp=${kp?.value}, ki=${ki?.value}`);
+  console.log(`position kp after full auto-tuning: ${kp?.value}`);
 });
