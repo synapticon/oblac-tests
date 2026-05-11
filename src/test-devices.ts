@@ -26,9 +26,9 @@ export const testDevices: TestDevice[] = [
   },
   {
     position: 3,
-    serialNumber: '8612-02-0001553-2341',
+    serialNumber: '8602-01-0000755-2243',
     name: 'circulo',
-    productName: 'Circulo 7 Safe Motion - 700, Magnetic Rings (pos.1&2), no external encoders',
+    productName: 'Circulo 7 Safe Motion - 700, Safe Motion, Magnetic Rings (pos.1&2), with port 2 transceivers ',
   },
 ];
 
