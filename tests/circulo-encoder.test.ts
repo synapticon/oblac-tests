@@ -5,10 +5,9 @@ import { circuloTestDevice } from '../src/test-devices.js';
 const device = circuloTestDevice;
 
 test('start-circulo-encoder-narrow-angle-calibration', async () => {
-  const { data, ok } = await api.devices.startCirculoEncoderNarrowAngleCalibrationProcedure(
-    device.serialNumber,
-    { 'request-timeout': 300_000 },
-  );
+  const { data, ok } = await api.devices.startCirculoEncoderNarrowAngleCalibrationProcedure(device.serialNumber, {
+    'request-timeout': 300_000,
+  });
 
   expect(ok).toBe(true);
   for (const step of data) {

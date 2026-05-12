@@ -1,6 +1,6 @@
 services:
   motion-master:
-    image: synapticon/motion-master:${MM_VERSION:-v5.4.1-flatbot.18}
+    image: synapticon/motion-master:v5.4.1-flatbot.18
     container_name: motion-master
     network_mode: host
     privileged: true
@@ -11,14 +11,23 @@ services:
       MM_PUB_SUB_PORT: "${MM_PUB_SUB_PORT:-63525}"
       MM_IPS: "${MM_IPS:-}"
       MM_PDO_MODE: "${MM_PDO_MODE:-monitor}"
-    restart: "no"
+    restart: no
 
   motion-master-api:
-    image: synapticon/motion-master-api:${MM_API_VERSION:-v0.0.390}
+    image: synapticon/motion-master-api:v0.0.392
     container_name: motion-master-api
     network_mode: host
     depends_on:
       - motion-master
     environment:
       PORT: "${MM_API_PORT:-63526}"
-    restart: "no"
+    restart: no
+
+  oblac-drives:
+    image: synapticon/oblac-drives:v3.1.1-flatbot.16
+    container_name: oblac-drives
+    depends_on:
+      - motion-master
+    ports:
+      - "${OBLAC_DRIVES_PORT:-63527}:80"
+    restart: no
