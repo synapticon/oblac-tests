@@ -18,8 +18,9 @@ export default defineConfig({
       'tests/circulo-auto-tuning.test.ts',
       'tests/circulo-encoder.test.ts',
       'tests/circulo-profiles.test.ts',
+      // 'tests/circulo-motion.test.ts',
       'tests/circulo-smm.test.ts',
-      // 'tests/integro-offset-detection.test.ts',
+      'tests/integro-offset-detection.test.ts',
     ],
     // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs
     // do redraw the test tree, but we accept that noise locally for the detail).

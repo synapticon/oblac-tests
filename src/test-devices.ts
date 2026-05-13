@@ -20,9 +20,9 @@ export const testDevices: TestDevice[] = [
   { position: 1, serialNumber: '9501-01-0001512-1851', name: 'node', productName: 'Node 400 EtherCAT' },
   {
     position: 2,
-    serialNumber: '9002-02-0000466-2339',
+    serialNumber: '6000-01-0000578-2546',
     name: 'integro',
-    productName: 'Integro-60 R1.5 (600 W, EtherCAT, STO, 18 bit + MT + IOs)',
+    productName: 'SOMANET Actilink S C Line G1, 60mm (ASC1-061A-0K-025-ECMH-M2G3-STO-01)',
   },
   {
     position: 3,
