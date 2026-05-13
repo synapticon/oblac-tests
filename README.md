@@ -81,19 +81,19 @@ Use `run-workflow.sh` to dispatch the workflow with specific image versions:
 ./run-workflow.sh --mm_version=<tag> --mm_api_version=<tag> [options]
 
 # Options:
-#   --mm_version=<tag>         Motion Master image tag, e.g. v5.4.1-flatbot.18
-#   --mm_api_version=<tag>     Motion Master API image tag, e.g. v0.0.390
+#   --mm_version=<tag>         Motion Master image tag, e.g. v5.4.1-flatbot.19
+#   --mm_api_version=<tag>     Motion Master API image tag, e.g. v0.0.396
 #   --file_filter=<pattern>    File path pattern passed to vitest (e.g. integro)
 #   --test_name_filter=<name>  Test name pattern passed to vitest -t (e.g. offset)
 #   --stream_api_logs=<bool>   Stream motion-master-api logs (default: true)
 #   --stream_mm_logs=<bool>    Stream motion-master logs (default: false)
 
 # Examples:
-./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390
-./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --file_filter=integro
-./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --test_name_filter=offset
-./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --file_filter=circulo --test_name_filter=offset
-./run-workflow.sh --mm_version=v5.4.1-flatbot.18 --mm_api_version=v0.0.390 --stream_mm_logs=true
+./run-workflow.sh --mm_version=v5.4.1-flatbot.19 --mm_api_version=v0.0.396
+./run-workflow.sh --mm_version=v5.4.1-flatbot.19 --mm_api_version=v0.0.396 --file_filter=integro
+./run-workflow.sh --mm_version=v5.4.1-flatbot.19 --mm_api_version=v0.0.396 --test_name_filter=offset
+./run-workflow.sh --mm_version=v5.4.1-flatbot.19 --mm_api_version=v0.0.396 --file_filter=circulo --test_name_filter=offset
+./run-workflow.sh --mm_version=v5.4.1-flatbot.19 --mm_api_version=v0.0.396 --stream_mm_logs=true
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.

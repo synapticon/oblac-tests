@@ -5,11 +5,11 @@ on:
     inputs:
       mm_version:
         description: "Motion Master image tag"
-        default: "v5.4.1-flatbot.18"
+        default: "v5.4.1-flatbot.19"
         required: false
       mm_api_version:
         description: "Motion Master API image tag"
-        default: "v0.0.390"
+        default: "v0.0.396"
         required: false
       file_filter:
         description: "File path pattern to run (e.g. integro, circulo)"

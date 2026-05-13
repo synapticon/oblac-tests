@@ -62,8 +62,8 @@ Key variables (see `.env.example` for full list):
 
 | Variable         | Default                  | Description                          |
 | ---------------- | ------------------------ | ------------------------------------ |
-| `MM_VERSION`     | `v5.4.1-flatbot.18`      | Motion Master image tag              |
-| `MM_API_VERSION` | `v0.0.390`               | Motion Master API image tag          |
+| `MM_VERSION`     | `v5.4.1-flatbot.19`      | Motion Master image tag              |
+| `MM_API_VERSION` | `v0.0.396`               | Motion Master API image tag          |
 | `MM_MAC`         | _(required)_             | EtherCAT network interface MAC       |
 | `MM_DRV`         | `soem`                   | EtherCAT driver (`soem` or `rtsoem`) |
 | `MM_API_PORT`    | `63526`                  | HTTP API port                        |
