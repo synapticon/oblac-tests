@@ -18,7 +18,7 @@ export default defineConfig({
       'tests/circulo-auto-tuning.test.ts',
       'tests/circulo-encoder.test.ts',
       'tests/circulo-profiles.test.ts',
-      // 'tests/circulo-motion.test.ts',
+      'tests/circulo-motion.test.ts',
       'tests/circulo-smm.test.ts',
       'tests/integro-offset-detection.test.ts',
     ],
