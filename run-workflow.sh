@@ -4,7 +4,7 @@ set -euo pipefail
 usage() {
   echo "Usage: $0 --mm_version=<tag> --mm_api_version=<tag> [options]"
   echo ""
-  echo "  --mm_version=<tag>         Motion Master image tag, e.g. v5.4.1-flatbot.19"
+  echo "  --mm_version=<tag>         Motion Master image tag, e.g. v5.5.0"
   echo "  --mm_api_version=<tag>     Motion Master API image tag, e.g. v0.0.396"
   echo "  --file_filter=<pattern>    File path pattern passed to vitest (e.g. integro)"
   echo "  --test_name_filter=<name>  Test name pattern passed to vitest -t (e.g. offset)"
