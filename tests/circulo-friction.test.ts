@@ -11,7 +11,10 @@ const SPEED_STEPS_MRPM = Array.from({ length: 10 }, (_, i) => (i + 1) * 1_000);
 
 // Parse the monitoring CSV (first row = parameter-ID headers) and return all values
 // from the column whose header contains `colHint` (e.g. "6077" for torque actual).
-function extractMonitoringColumn(csv: string, colHint: string): number[] {
+function extractMonitoringColumn(csv: string | null | undefined, colHint: string): number[] {
+  if (!csv) {
+    return [];
+  }
   const lines = csv.trim().split('\n').filter((l) => l.length > 0);
   if (lines.length < 2) {
     return [];
@@ -34,7 +37,8 @@ test('friction torque sweep 1000–10000 mRPM', async () => {
 
   for (const speedMrpm of SPEED_STEPS_MRPM) {
     // Fresh monitoring session — clears any previous data for this device
-    await api.devices.startMonitoring(device.serialNumber);
+    const { ok: monitoringStarted } = await api.devices.startMonitoring(device.serialNumber);
+    expect(monitoringStarted).toBe(true);
 
     // skip-quick-stop=true: MM returns once OPERATION_ENABLED, motor keeps running
     await api.devices.runVelocityProfile(device.serialNumber, undefined, {
@@ -53,8 +57,12 @@ test('friction torque sweep 1000–10000 mRPM', async () => {
     const { data: csv } = await api.devices.getMonitoringData(device.serialNumber);
     await api.devices.stopMonitoring(device.serialNumber);
 
+    const csvText = csv as unknown as string | null;
+    const headerLine = csvText?.trim().split('\n')[0] ?? '(empty)';
+    console.log(`monitoring headers: ${headerLine}`);
+
     // 0x6077: Torque actual value — signed permil (‰) of rated torque (CiA 402)
-    const torqueValues = extractMonitoringColumn(csv as unknown as string, '6077');
+    const torqueValues = extractMonitoringColumn(csvText, '6077');
     expect(torqueValues.length).toBeGreaterThanOrEqual(10);
 
     // Average the last 10 samples to smooth out noise
