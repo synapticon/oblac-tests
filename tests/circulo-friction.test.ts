@@ -54,7 +54,7 @@ test('friction torque sweep 1000–10000 mRPM', async () => {
     // Wait for the motor to reach steady state at the target speed
     await resolveAfter(2_000);
 
-    const { data: csv } = await api.devices.getMonitoringData(device.serialNumber);
+    const { data: csv } = await api.devices.getMonitoringData(device.serialNumber, { format: 'text' });
     await api.devices.stopMonitoring(device.serialNumber);
 
     const csvText = csv as unknown as string | null;
