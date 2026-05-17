@@ -77,6 +77,40 @@ Key variables (see `.env.example` for full list):
 - No comments unless the WHY is non-obvious.
 - Biome (`biome.json`) enforces formatting and linting — run `npm run check` to auto-fix.
 
+## Adding new test files
+
+New test files are **not** auto-discovered. Every new `tests/*.test.ts` file must be explicitly added to the `include` array in `vitest.config.ts`, otherwise Vitest silently finds no matching tests and exits with code 1.
+
+## Monitoring API
+
+The monitoring API (`startMonitoring` / `getMonitoringData` / `stopMonitoring`) streams EtherCAT PDO data as CSV. Several non-obvious behaviours:
+
+- **`getMonitoringData` returns `null` without a format hint.** The generated HTTP client does not parse the response body unless a format is specified. Always pass `{ format: 'text' }` as the `params` argument, exactly as `getDeviceFile` does in the system-identification test:
+  ```ts
+  const { data: csv } = await api.devices.getMonitoringData(serialNumber, { format: 'text' });
+  ```
+- **Verify `startMonitoring` succeeded** before relying on the data:
+  ```ts
+  const { ok } = await api.devices.startMonitoring(serialNumber);
+  expect(ok).toBe(true);
+  ```
+- **CSV column header format is `0xINDEX:SUBINDEX`** (e.g. `0x6077:00`). Match by substring when searching for a parameter column — the exact casing or zero-padding may vary across firmware versions.
+- **`getMonitoringData` accumulates all samples since `startMonitoring`.** Call `startMonitoring` at the beginning of each measurement window to reset the buffer. Take the _last N_ rows (not the first) so that data collected during acceleration ramps or state transitions is excluded.
+- **Always call `stopMonitoring` after reading**, even on failure paths, to avoid leaving a dangling session that would be silently replaced by the next `startMonitoring` call.
+
+## Reading physical quantities from the object dictionary
+
+When computing a result in standard engineering units, read the relevant scaling constant from the device dictionary rather than hard-coding it — hardware variants have different rated values.
+
+Key objects (CiA 402):
+
+| Object  | Name                  | Unit  | Value type  |
+| ------- | --------------------- | ----- | ----------- |
+| `0x6076` | Motor rated torque   | mNm   | `uintValue` |
+| `0x6077` | Torque actual value  | ‰ of rated torque (permil) | `intValue` |
+| `0x6064` | Position actual      | inc   | `intValue`  |
+| `0x606C` | Velocity actual      | unit defined by `0x60A9` (SI Unit Velocity) | `intValue`  |
+
 ## Notes
 
 - Tests run sequentially (`pool: forks`, `singleFork: true`) — multiple devices are connected but tests target specific ones.
