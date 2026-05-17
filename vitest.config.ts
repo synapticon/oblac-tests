@@ -20,6 +20,8 @@ export default defineConfig({
       'tests/circulo-profiles.test.ts',
       'tests/circulo-motion.test.ts',
       'tests/circulo-smm.test.ts',
+      'tests/circulo-cia402.test.ts',
+      'tests/circulo-friction.test.ts',
       'tests/integro-offset-detection.test.ts',
     ],
     // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs
