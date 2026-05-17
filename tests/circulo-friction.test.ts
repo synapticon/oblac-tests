@@ -33,7 +33,17 @@ function extractMonitoringColumn(csv: string | null | undefined, colHint: string
 test('friction torque sweep 1000–10000 mRPM', async () => {
   await api.devices.resetFault(device.serialNumber, { force: true });
 
-  const results: { speedMrpm: number; torquePermil: number }[] = [];
+  // 0x6076: Motor rated torque — unit is mNm (CiA 402)
+  const { data: ratedTorqueData } = await api.devices.getDeviceParameterValues(device.serialNumber, [
+    { index: 0x6076, subindex: 0 },
+  ]);
+  const [ratedTorqueParam] = ratedTorqueData.parameterValues ?? [];
+  const ratedTorqueMNm = ratedTorqueParam?.uintValue;
+  expect(ratedTorqueMNm).toBeTypeOf('number');
+  console.log(`rated torque: ${ratedTorqueMNm} mNm (${((ratedTorqueMNm as number) / 1000).toFixed(3)} Nm)`);
+
+  const results: { speedMrpm: number; torquePermil: number; frictionTorqueMNm: number; frictionCoeffNmSRad: number }[] =
+    [];
 
   for (const speedMrpm of SPEED_STEPS_MRPM) {
     // Fresh monitoring session — clears any previous data for this device
@@ -57,21 +67,24 @@ test('friction torque sweep 1000–10000 mRPM', async () => {
     const { data: csv } = await api.devices.getMonitoringData(device.serialNumber, { format: 'text' });
     await api.devices.stopMonitoring(device.serialNumber);
 
-    const csvText = csv as unknown as string | null;
-    const headerLine = csvText?.trim().split('\n')[0] ?? '(empty)';
-    console.log(`monitoring headers: ${headerLine}`);
-
     // 0x6077: Torque actual value — signed permil (‰) of rated torque (CiA 402)
-    const torqueValues = extractMonitoringColumn(csvText, '6077');
+    const torqueValues = extractMonitoringColumn(csv as unknown as string | null, '6077');
     expect(torqueValues.length).toBeGreaterThanOrEqual(10);
 
     // Average the last 10 samples to smooth out noise
     const last10 = torqueValues.slice(-10);
     const torquePermil = Math.round(last10.reduce((sum, v) => sum + v, 0) / last10.length);
 
-    results.push({ speedMrpm, torquePermil });
+    // Friction torque: τ = (permil / 1000) × rated_torque
+    const frictionTorqueMNm = (torquePermil / 1000) * (ratedTorqueMNm as number);
+    // Angular velocity: ω [rad/s] = speed [mRPM] / 1000 [RPM] × 2π / 60
+    const omegaRadS = (speedMrpm / 1000) * ((2 * Math.PI) / 60);
+    // Viscous friction coefficient: B [Nm·s/rad] = τ [Nm] / ω [rad/s]
+    const frictionCoeffNmSRad = frictionTorqueMNm / 1000 / omegaRadS;
+
+    results.push({ speedMrpm, torquePermil, frictionTorqueMNm, frictionCoeffNmSRad });
     console.log(
-      `${speedMrpm} mRPM → torque actual (avg 10 samples): ${torquePermil} ‰ (${(torquePermil / 10).toFixed(1)} %) [${torqueValues.length} total samples]`,
+      `${speedMrpm} mRPM → friction torque: ${frictionTorqueMNm.toFixed(1)} mNm, B = ${frictionCoeffNmSRad.toFixed(4)} Nm·s/rad [avg of last 10 / ${torqueValues.length} samples]`,
     );
 
     await api.devices.quickStop(device.serialNumber);
@@ -80,16 +93,22 @@ test('friction torque sweep 1000–10000 mRPM', async () => {
   }
 
   expect(results).toHaveLength(SPEED_STEPS_MRPM.length);
-  for (const { torquePermil } of results) {
-    expect(Number.isFinite(torquePermil)).toBe(true);
+  for (const { frictionTorqueMNm, frictionCoeffNmSRad } of results) {
+    expect(Number.isFinite(frictionTorqueMNm)).toBe(true);
+    expect(Number.isFinite(frictionCoeffNmSRad)).toBe(true);
   }
 
+  const avgB =
+    results.reduce((sum, { frictionCoeffNmSRad }) => sum + frictionCoeffNmSRad, 0) / results.length;
+
   console.log('\nFriction summary:');
-  console.log('Speed [mRPM] | Torque actual [‰] | Torque actual [%]');
-  console.log('-------------|-------------------|------------------');
-  for (const { speedMrpm, torquePermil } of results) {
+  console.log('Speed [mRPM] | ω [rad/s] | τ_friction [mNm] | B [Nm·s/rad]');
+  console.log('-------------|-----------|------------------|-------------');
+  for (const { speedMrpm, frictionTorqueMNm, frictionCoeffNmSRad } of results) {
+    const omega = (speedMrpm / 1000) * ((2 * Math.PI) / 60);
     console.log(
-      `${String(speedMrpm).padStart(11)} | ${String(torquePermil).padStart(17)} | ${(torquePermil / 10).toFixed(1).padStart(17)}`,
+      `${String(speedMrpm).padStart(11)} | ${omega.toFixed(4).padStart(9)} | ${frictionTorqueMNm.toFixed(1).padStart(16)} | ${frictionCoeffNmSRad.toFixed(4).padStart(12)}`,
     );
   }
+  console.log(`\nMean viscous friction coefficient B = ${avgB.toFixed(4)} Nm·s/rad`);
 }, 120_000);
