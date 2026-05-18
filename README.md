@@ -132,7 +132,10 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `circulo-system-identification.test.ts` | System identification on the Circulo 7: runs the chirp signal, verifies `plant_model.csv` was created, and prints the parsed plant model                                                                    |
 | `circulo-auto-tuning.test.ts`           | Compute and full auto-tuning for velocity and position controllers on the Circulo 7; zeros out gains before each run, verifies kp > 0 after tuning                                                          |
 | `circulo-smm.test.ts`                   | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart                                                                                                               |
+| `circulo-firmware.test.ts`              | **Opt-in** (~5 min, commented out in `vitest.config.ts`): installs Circulo firmware v5.6.5, factory-resets, installs v5.6.6, verifies `0x100A`, then `load-config` and verifies `0x2001` matches the CSV    |
 | `integro-offset-detection.test.ts`      | Full offset detection run on the Integro-60                                                                                                                                                                 |
+
+To run the opt-in firmware test, uncomment the `tests/circulo-firmware.test.ts` entry in `vitest.config.ts` and run `npm test -- circulo-firmware`. Re-comment when done.
 
 ```bash
 npm run test:watch   # re-run on file changes
