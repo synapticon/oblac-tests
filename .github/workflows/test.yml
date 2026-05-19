@@ -33,7 +33,7 @@ on:
 jobs:
   test:
     name: Run tests
-    runs-on: [self-hosted, OptiPlex-3080]
+    runs-on: [self-hosted, ci-belgrade-linux]
     timeout-minutes: 60
     env:
       CI: "true"

@@ -3,9 +3,9 @@
   hosts: local
   become: true
   roles:
-    - test-machine
-    - rustdesk
-    - oblac-drives-releases
+    - { role: test-machine, tags: test-machine }
+    - { role: rustdesk, tags: rustdesk }
+    - { role: oblac-drives-releases, tags: oblac-drives-releases }
 
 - name: Set up test environment
   hosts: local
@@ -54,4 +54,4 @@
   hosts: local
   become: false
   roles:
-    - actions-runner
+    - { role: actions-runner, tags: actions-runner }

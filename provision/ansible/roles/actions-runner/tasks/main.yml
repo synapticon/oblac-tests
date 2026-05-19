@@ -31,7 +31,7 @@
 
     - name: Get registration token
       ansible.builtin.command:
-        cmd: "gh api -X POST /repos/{{ runner_repo }}/actions/runners/registration-token -q .token"
+        cmd: "gh api -X POST /orgs/{{ runner_org }}/actions/runners/registration-token -q .token"
       register: registration_token
       changed_when: false
       no_log: true
@@ -40,7 +40,7 @@
       ansible.builtin.command:
         cmd: >-
           ./config.sh
-          --url https://github.com/{{ runner_repo }}
+          --url https://github.com/{{ runner_org }}
           --token {{ registration_token.stdout }}
           --name {{ runner_name }}
           --labels {{ runner_extra_labels | join(',') }}
@@ -52,7 +52,7 @@
 
 - name: Set runner service name
   ansible.builtin.set_fact:
-    runner_service: "actions.runner.{{ runner_repo | replace('/', '-') }}.{{ runner_name }}.service"
+    runner_service: "actions.runner.{{ runner_org }}.{{ runner_name }}.service"
 
 - name: Install runner systemd service
   ansible.builtin.command:

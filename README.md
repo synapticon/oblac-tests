@@ -19,12 +19,12 @@ The target platform is **Ubuntu 26.04 LTS**. To provision a fresh machine:
 bash <(curl -fsSL https://raw.githubusercontent.com/synapticon/oblac-tests/main/provision/bootstrap.sh)
 ```
 
-This installs Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`, VS Code, and RustDesk, clones the repository, runs `npm install`, creates `.env` from `.env.example`, caches available `oblac-drives` Debian packages to `~/oblac-drives-releases/`, and registers the machine as a self-hosted GitHub Actions runner for the repo.
+This installs Docker, Node.js, Python, build tools, `gh`, `lazygit`, `vim`, VS Code, and RustDesk, clones the repository, runs `npm install`, creates `.env` from `.env.example`, caches available `oblac-drives` Debian packages to `~/oblac-drives-releases/`, and registers the machine as a self-hosted GitHub Actions runner at the `synapticon` org scope (runner name `ci-belgrade-linux`, with the hostname as an extra label).
 
-The runner registration step requires `gh` to be authenticated with admin permission on `synapticon/oblac-tests`. The first run will fail at that step on a fresh machine (since `gh` is installed by the playbook itself); after the failure, run:
+The runner registration step requires `gh` to be authenticated with the `admin:org` scope on `synapticon`. The first run will fail at that step on a fresh machine (since `gh` is installed by the playbook itself); after the failure, run:
 
 ```bash
-gh auth login
+gh auth login              # or `gh auth refresh -h github.com -s admin:org` if already logged in
 ./provision/play.sh
 ```
 
@@ -36,21 +36,21 @@ To re-provision an existing machine:
 ./provision/play.sh
 ```
 
-`play.sh` prompts for the BECOME (sudo) password and forwards any extra arguments to `ansible-playbook`, so you can pass through tags, extra-vars, limits, etc. — for example `./provision/play.sh -e rustdesk_password=yourpassword` or `./provision/play.sh --tags actions-runner`.
+`play.sh` prompts for the BECOME (sudo) password and forwards any extra arguments to `ansible-playbook`, so you can pass through tags, extra-vars, limits, etc. Each role is tagged with its own name (`test-machine`, `rustdesk`, `oblac-drives-releases`, `actions-runner`), so you can re-run a single role with `--tags <role>`. Examples: `./provision/play.sh -e rustdesk_password=yourpassword` or `./provision/play.sh --tags actions-runner`.
 
 ### Checking the GitHub Actions runner
 
-The runner is installed as a systemd service named `actions.runner.synapticon-oblac-tests.$(hostname).service`.
+The runner is installed as a systemd service named `actions.runner.synapticon.ci-belgrade-linux.service`.
 
 ```bash
 # status
-systemctl status "actions.runner.synapticon-oblac-tests.$(hostname).service"
+systemctl status actions.runner.synapticon.ci-belgrade-linux.service
 
 # follow logs
-journalctl -u "actions.runner.synapticon-oblac-tests.$(hostname).service" -f
+journalctl -u actions.runner.synapticon.ci-belgrade-linux.service -f
 
 # recent logs
-journalctl -u "actions.runner.synapticon-oblac-tests.$(hostname).service" -n 200 --no-pager
+journalctl -u actions.runner.synapticon.ci-belgrade-linux.service -n 200 --no-pager
 ```
 
 The runner's own helper also works, but it must be run from the runner directory and with `sudo`:
@@ -71,7 +71,7 @@ RustDesk is installed automatically by the playbook. To set a permanent unattend
 
 The playbook prints the machine's RustDesk ID at the end of every run (via `rustdesk --get-id`); that's what you use to connect from your own machine. The same ID is also visible in the RustDesk app on the test machine.
 
-The CI workflow (`.github/workflows/test.yml`) is `workflow_dispatch`-only and targets `runs-on: [self-hosted, OptiPlex-3080]`. To target a different machine, change the second label to that machine's hostname (each runner is auto-labelled with its hostname by the playbook).
+The CI workflow (`.github/workflows/test.yml`) is `workflow_dispatch`-only and targets `runs-on: [self-hosted, ci-belgrade-linux]`. The `actions-runner` role labels each runner with both `ci-belgrade-linux` and the machine's hostname; to pin the workflow to a specific machine instead of any `ci-belgrade-linux` runner, swap the second label for that machine's hostname.
 
 ## Run Workflow
 
