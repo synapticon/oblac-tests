@@ -1,4 +1,42 @@
 ---
+- name: Verify gh is authenticated
+  ansible.builtin.command: gh auth status
+  changed_when: false
+
+- name: Look up runner group ID
+  ansible.builtin.command:
+    argv:
+      - gh
+      - api
+      - "/orgs/{{ runner_org }}/actions/runner-groups"
+      - --jq
+      - '.runner_groups[] | select(.name == "{{ runner_group }}") | .id'
+  register: runner_group_lookup
+  changed_when: false
+
+- name: Create runner group
+  when: runner_group_lookup.stdout == ""
+  ansible.builtin.command:
+    argv:
+      - gh
+      - api
+      - -X
+      - POST
+      - "/orgs/{{ runner_org }}/actions/runner-groups"
+      - -f
+      - "name={{ runner_group }}"
+      - -f
+      - visibility=all
+      - -F
+      - allows_public_repositories=true
+      - --jq
+      - .id
+  register: runner_group_create
+
+- name: Set runner group ID
+  ansible.builtin.set_fact:
+    runner_group_id: "{{ runner_group_create.stdout if runner_group_lookup.stdout == '' else runner_group_lookup.stdout }}"
+
 - name: Check if runner is configured
   ansible.builtin.stat:
     path: "{{ runner_dir }}/.runner"
@@ -7,10 +45,6 @@
 - name: Register runner
   when: not runner_configured.stat.exists
   block:
-    - name: Verify gh is authenticated
-      ansible.builtin.command: gh auth status
-      changed_when: false
-
     - name: Create runner directory
       ansible.builtin.file:
         path: "{{ runner_dir }}"
@@ -43,12 +77,34 @@
           --url https://github.com/{{ runner_org }}
           --token {{ registration_token.stdout }}
           --name {{ runner_name }}
+          --runnergroup {{ runner_group }}
           --labels {{ runner_extra_labels | join(',') }}
           --unattended
           --replace
         chdir: "{{ runner_dir }}"
         creates: "{{ runner_dir }}/.runner"
       no_log: true
+
+- name: Look up runner ID
+  ansible.builtin.command:
+    argv:
+      - gh
+      - api
+      - "/orgs/{{ runner_org }}/actions/runners"
+      - --jq
+      - '.runners[] | select(.name == "{{ runner_name }}") | .id'
+  register: runner_id_lookup
+  changed_when: false
+
+- name: Assign runner to group
+  ansible.builtin.command:
+    argv:
+      - gh
+      - api
+      - -X
+      - PUT
+      - "/orgs/{{ runner_org }}/actions/runner-groups/{{ runner_group_id }}/runners/{{ runner_id_lookup.stdout }}"
+  changed_when: false
 
 - name: Set runner service name
   ansible.builtin.set_fact:
