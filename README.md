@@ -87,6 +87,7 @@ Use `run-workflow.sh` to dispatch the workflow with specific image versions:
 #   --test_name_filter=<name>  Test name pattern passed to vitest -t (e.g. offset)
 #   --stream_api_logs=<bool>   Stream motion-master-api logs (default: true)
 #   --stream_mm_logs=<bool>    Stream motion-master logs (default: false)
+#   --optional_tests=<list>    Extra test suites: firmware, jonas (comma-separated, or 'all')
 
 # Examples:
 ./run-workflow.sh --mm_version=v5.5.0 --mm_api_version=v0.0.396
@@ -94,6 +95,8 @@ Use `run-workflow.sh` to dispatch the workflow with specific image versions:
 ./run-workflow.sh --mm_version=v5.5.0 --mm_api_version=v0.0.396 --test_name_filter=offset
 ./run-workflow.sh --mm_version=v5.5.0 --mm_api_version=v0.0.396 --file_filter=circulo --test_name_filter=offset
 ./run-workflow.sh --mm_version=v5.5.0 --mm_api_version=v0.0.396 --stream_mm_logs=true
+./run-workflow.sh --mm_version=v5.5.0 --mm_api_version=v0.0.396 --optional_tests=jonas --file_filter=jonas
+./run-workflow.sh --mm_version=v5.5.0 --mm_api_version=v0.0.396 --optional_tests=all
 ```
 
 Requires `gh` authenticated with permission to dispatch workflows on `synapticon/oblac-tests`.
@@ -132,10 +135,17 @@ Vitest starts the Docker services, waits 3 s for the containers to come up, conn
 | `circulo-system-identification.test.ts` | System identification on the Circulo 7: runs the chirp signal, verifies `plant_model.csv` was created, and prints the parsed plant model                                                                    |
 | `circulo-auto-tuning.test.ts`           | Compute and full auto-tuning for velocity and position controllers on the Circulo 7; zeros out gains before each run, verifies kp > 0 after tuning                                                          |
 | `circulo-smm.test.ts`                   | SMM (Safe Motion Module) OS commands on the Circulo 7: read SMM firmware version, SMM restart                                                                                                               |
-| `circulo-firmware.test.ts`              | **Opt-in** (~5 min, commented out in `vitest.config.ts`): installs Circulo firmware v5.6.5, factory-resets, installs v5.6.6, verifies `0x100A`, then `load-config` and verifies `0x2001` matches the CSV    |
+| `circulo-firmware.test.ts`              | **Opt-in** (`OPTIONAL_TESTS=firmware`, ~5 min): installs Circulo firmware v5.6.5, factory-resets, installs v5.6.6, verifies `0x100A`, then `load-config` and verifies `0x2001` matches the CSV             |
+| `jonas.test.ts`                         | **Opt-in** (`OPTIONAL_TESTS=jonas`): factory reset → v5.6.6 install → load config → encoder → offset detection                                                                                             |
 | `integro-offset-detection.test.ts`      | Full offset detection run on the Integro-60                                                                                                                                                                 |
 
-To run the opt-in firmware test, uncomment the `tests/circulo-firmware.test.ts` entry in `vitest.config.ts` and run `npm test -- circulo-firmware`. Re-comment when done.
+The opt-in tests are excluded from the default run. To include them locally:
+
+```bash
+OPTIONAL_TESTS=firmware npm test -- circulo-firmware
+OPTIONAL_TESTS=jonas npm test -- jonas
+OPTIONAL_TESTS=all npm test
+```
 
 ```bash
 npm run test:watch   # re-run on file changes
