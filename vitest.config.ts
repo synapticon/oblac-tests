@@ -23,7 +23,9 @@ export default defineConfig({
       'tests/circulo-cia402.test.ts',
       'tests/circulo-friction.test.ts',
       // ~5 min run (two firmware installs + factory reset). Uncomment to run manually.
-      'tests/circulo-firmware.test.ts',
+      // 'tests/circulo-firmware.test.ts',
+      // factory reset → v5.6.6 install → load config → encoder → offset detection
+      'tests/jonas.test.ts',
       'tests/integro-offset-detection.test.ts',
     ],
     // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs
