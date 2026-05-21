@@ -1,5 +1,10 @@
 import { defineConfig } from 'vitest/config';
 
+const optional = new Set(
+  (process.env.OPTIONAL_TESTS ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+);
+const runAll = optional.has('all');
+
 export default defineConfig({
   test: {
     globals: true,
@@ -22,11 +27,11 @@ export default defineConfig({
       'tests/circulo-smm.test.ts',
       'tests/circulo-cia402.test.ts',
       'tests/circulo-friction.test.ts',
-      // ~5 min run (two firmware installs + factory reset). Uncomment to run manually.
-      // 'tests/circulo-firmware.test.ts',
-      // factory reset → v5.6.6 install → load config → encoder → offset detection
-      'tests/jonas.test.ts',
       'tests/integro-offset-detection.test.ts',
+      // Optional: pass OPTIONAL_TESTS=firmware (or 'all') to include (~5 min: two firmware installs + factory reset)
+      ...(runAll || optional.has('firmware') ? ['tests/circulo-firmware.test.ts'] : []),
+      // Optional: pass OPTIONAL_TESTS=jonas (or 'all') to include
+      ...(runAll || optional.has('jonas') ? ['tests/jonas.test.ts'] : []),
     ],
     // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs
     // do redraw the test tree, but we accept that noise locally for the detail).

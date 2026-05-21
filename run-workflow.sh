@@ -10,6 +10,7 @@ usage() {
   echo "  --test_name_filter=<name>  Test name pattern passed to vitest -t (e.g. offset)"
   echo "  --stream_api_logs=<bool>   Stream motion-master-api logs (default: true)"
   echo "  --stream_mm_logs=<bool>    Stream motion-master logs (default: false)"
+  echo "  --optional_tests=<list>    Extra test suites: firmware, jonas (comma-separated, or 'all')"
   exit 1
 }
 
@@ -19,6 +20,7 @@ FILE_FILTER=""
 TEST_NAME_FILTER=""
 STREAM_API_LOGS=""
 STREAM_MM_LOGS=""
+OPTIONAL_TESTS=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -28,6 +30,7 @@ for arg in "$@"; do
     --test_name_filter=*) TEST_NAME_FILTER="${arg#*=}" ;;
     --stream_api_logs=*)  STREAM_API_LOGS="${arg#*=}" ;;
     --stream_mm_logs=*)   STREAM_MM_LOGS="${arg#*=}" ;;
+    --optional_tests=*)   OPTIONAL_TESTS="${arg#*=}" ;;
     *) echo "Unknown argument: $arg"; usage ;;
   esac
 done
@@ -43,9 +46,10 @@ FIELDS=(
 [[ -n "$TEST_NAME_FILTER" ]] && FIELDS+=(--field "test_name_filter=${TEST_NAME_FILTER}")
 [[ -n "$STREAM_API_LOGS" ]]  && FIELDS+=(--field "stream_api_logs=${STREAM_API_LOGS}")
 [[ -n "$STREAM_MM_LOGS" ]]   && FIELDS+=(--field "stream_mm_logs=${STREAM_MM_LOGS}")
+[[ -n "$OPTIONAL_TESTS" ]]   && FIELDS+=(--field "optional_tests=${OPTIONAL_TESTS}")
 
 gh workflow run test.yml "${FIELDS[@]}"
-echo "Triggered: MM=${MM_VERSION} API=${MM_API_VERSION}${FILE_FILTER:+ file=${FILE_FILTER}}${TEST_NAME_FILTER:+ name=${TEST_NAME_FILTER}}${STREAM_API_LOGS:+ stream_api_logs=${STREAM_API_LOGS}}${STREAM_MM_LOGS:+ stream_mm_logs=${STREAM_MM_LOGS}}"
+echo "Triggered: MM=${MM_VERSION} API=${MM_API_VERSION}${FILE_FILTER:+ file=${FILE_FILTER}}${TEST_NAME_FILTER:+ name=${TEST_NAME_FILTER}}${STREAM_API_LOGS:+ stream_api_logs=${STREAM_API_LOGS}}${STREAM_MM_LOGS:+ stream_mm_logs=${STREAM_MM_LOGS}}${OPTIONAL_TESTS:+ optional_tests=${OPTIONAL_TESTS}}"
 
 sleep 3
 RUN_ID=$(gh run list --workflow=test.yml --limit=1 --json databaseId --jq '.[0].databaseId')

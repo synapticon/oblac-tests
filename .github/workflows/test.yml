@@ -29,6 +29,10 @@ on:
         type: boolean
         default: false
         required: false
+      optional_tests:
+        description: "Extra test suites to add (default run excludes these): firmware, jonas (comma-separated, or 'all')"
+        default: ""
+        required: false
 
 jobs:
   test:
@@ -48,6 +52,7 @@ jobs:
       PSU_URL: "http://192.168.212.103"
       STREAM_API_LOGS: ${{ inputs.stream_api_logs }}
       STREAM_MM_LOGS: ${{ inputs.stream_mm_logs }}
+      OPTIONAL_TESTS: ${{ inputs.optional_tests }}
 
     steps:
       - name: Checkout
