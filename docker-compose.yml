@@ -24,7 +24,7 @@ services:
     restart: no
 
   oblac-drives:
-    image: synapticon/oblac-drives:v3.1.1-flatbot.16
+    image: synapticon/oblac-drives:v3.3.2
     container_name: oblac-drives
     depends_on:
       - motion-master
