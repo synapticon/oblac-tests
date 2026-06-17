@@ -72,6 +72,9 @@ Key variables (see `.env.example` for full list):
 | `MM_DRV`         | `soem`                   | EtherCAT driver (`soem` or `rtsoem`) |
 | `MM_API_PORT`    | `63526`                  | HTTP API port                        |
 | `PSU_URL`        | `http://192.168.212.103` | ESP32 PSU controller base URL        |
+| `CIRCULO_SERIAL` | _(rig device)_           | Override the Circulo 7 serial the `circulo-*` tests target |
+
+`CIRCULO_SERIAL` overrides the serial number of `circuloTestDevice` in `test-devices.ts`, letting the `circulo-*` suites run against a different connected Circulo 7. Unlike the `MM_*` variables it is read from the test process environment (not docker-compose), so it must be set in the shell invoking vitest — e.g. `CIRCULO_SERIAL=8502-03-0001353-2115 npx vitest run tests/circulo-position-profile.test.ts`.
 
 ## Code style
 
