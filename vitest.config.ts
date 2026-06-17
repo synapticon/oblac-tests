@@ -1,7 +1,10 @@
 import { defineConfig } from 'vitest/config';
 
 const optional = new Set(
-  (process.env.OPTIONAL_TESTS ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+  (process.env.OPTIONAL_TESTS ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean),
 );
 const runAll = optional.has('all');
 
@@ -33,6 +36,8 @@ export default defineConfig({
       ...(runAll || optional.has('firmware') ? ['tests/circulo-firmware.test.ts'] : []),
       // Optional: pass OPTIONAL_TESTS=jonas (or 'all') to include
       ...(runAll || optional.has('jonas') ? ['tests/jonas.test.ts'] : []),
+      // Optional: pass OPTIONAL_TESTS=zvezdan (or 'all') to include
+      ...(runAll || optional.has('zvezdan') ? ['tests/zvezdan.test.ts'] : []),
     ],
     // Local: 'verbose' for per-test feedback (the streamed [srv]/[api] logs
     // do redraw the test tree, but we accept that noise locally for the detail).
