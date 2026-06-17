@@ -9,7 +9,7 @@ on:
         required: false
       mm_api_version:
         description: "Motion Master API image tag"
-        default: "v0.0.407"
+        default: "v0.0.408"
         required: false
       file_filter:
         description: "File path pattern to run (e.g. integro, circulo)"

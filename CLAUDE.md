@@ -17,7 +17,7 @@ Hardware-in-the-loop integration tests for Motion Master / SOMANET devices, plus
   - `circulo-files.test.ts` — device file system operations (list, upload, download, delete) on the Circulo 7; covers both regular and hidden (`.`-prefixed) files, with unlock-before-write/delete semantics for hidden files, and error paths (nonexistent file, missing unlock)
   - `circulo-config.test.ts` — save-config, load-config, and parameter restore on the Circulo 7; uses `ConfigFile` from `motion-master-client` to parse the CSV and derive expected values
   - `circulo-profiles.test.ts` — position profile, velocity profile, torque profile (1 s post-torque settlement after `skip-quick-stop=false` — lets the drive leave CiA 402 QUICK_STOP_ACTIVE before the next test), and quick-stop on the Circulo 7; error paths for missing `target-reach-timeout` when `skip-quick-stop: false`
-  - `circulo-motion.test.ts` — two half-rotation (262_144 counts = half of the Circulo's 2^19/rev encoder) position profiles in opposite directions on the Circulo 7; first with `skip-quick-stop=true` (asserts OPERATION_ENABLED mid-motion, sleeps 7 s to let the drive rotate), second with `skip-quick-stop=false` (blocks until target-reach + 2 s hold), then sleeps 1 s and asserts SWITCH_ON_DISABLED
+  - `circulo-motion.test.ts` — two half-rotation (262_144 counts = half of the Circulo's 2^19/rev encoder) position profiles in opposite directions on the Circulo 7; first with `skip-quick-stop=true` (asserts OPERATION_ENABLED mid-motion, then blocks on `when-target-reached` until the rotation completes), second with `skip-quick-stop=false` (blocks until target-reach + 2 s hold), then blocks on `when-cia402-state-reached` until SWITCH_ON_DISABLED
   - `circulo-offset-detection.test.ts` — full offset detection run on the Circulo 7
   - `circulo-encoder.test.ts` — Circulo 7 encoder procedures: narrow-angle calibration (up to 300 s, logs per-step results), encoder configuration, and encoder error check (expects empty error list)
   - `circulo-system-identification.test.ts` — system identification on the Circulo 7: deletes any existing `plant_model.csv`, runs the chirp signal via `start-system-identification`, verifies the file was created, downloads and parses it with `parsePlantModelCsv` from `motion-master-client`
@@ -67,7 +67,7 @@ Key variables (see `.env.example` for full list):
 | Variable         | Default                  | Description                          |
 | ---------------- | ------------------------ | ------------------------------------ |
 | `MM_VERSION`     | `v5.5.6`                 | Motion Master image tag              |
-| `MM_API_VERSION` | `v0.0.407`               | Motion Master API image tag          |
+| `MM_API_VERSION` | `v0.0.408`               | Motion Master API image tag          |
 | `MM_MAC`         | _(required)_             | EtherCAT network interface MAC       |
 | `MM_DRV`         | `soem`                   | EtherCAT driver (`soem` or `rtsoem`) |
 | `MM_API_PORT`    | `63526`                  | HTTP API port                        |

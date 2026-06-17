@@ -1,4 +1,3 @@
-import { resolveAfter } from 'motion-master-client';
 import { describe, expect, test } from 'vitest';
 import type { RequestParams } from '../src/mm-api.js';
 import { api } from '../src/setup.js';
@@ -55,17 +54,26 @@ async function expectState(expected: string) {
   expect(state).toBe(expected);
 }
 
-// Poll statusword (0x6041) bit 10 (target reached) so the after-position is read once the
-// move has actually settled rather than mid-ramp.
-async function waitForTargetReached(timeoutMs = 30_000): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    const { data } = await api.devices.uploadParameter(device.serialNumber, '0x6041', '0x00');
-    if (((data.value as number) & 0x400) !== 0) {
-      return;
-    }
-    await resolveAfter(100);
-  }
+// Block until the drive sets statusword (0x6041) bit 10 (target reached) so the after-position
+// is read once the move has actually settled rather than mid-ramp. Uses the server-side
+// when-target-reached endpoint rather than polling the parameter from the test.
+async function waitForTargetReached(): Promise<void> {
+  const { ok, data } = await api.devices.whenTargetReached(device.serialNumber, {
+    'monitoring-interval': 500,
+    'request-timeout': 30_000,
+  });
+  expect(ok).toBe(true);
+  expect(data.targetReached).toBe(true);
+}
+
+// Block until the drive reaches the given CiA 402 state, server-side. Resolving without error is
+// itself the assertion (the endpoint errors if the state is not reached within request-timeout).
+async function waitForCia402State(state: string): Promise<void> {
+  const { ok } = await api.devices.whenCia402StateReached(device.serialNumber, state, {
+    'monitoring-interval': 200,
+    'request-timeout': 10_000,
+  });
+  expect(ok).toBe(true);
 }
 
 function recordMove(stats: MoveStat[], label: string, target: number, posBefore: number, posAfter: number): MoveStat {
@@ -131,16 +139,14 @@ describe('position profile quarter-rotation cycles', () => {
         let posBefore = await readPos();
         await runQuarterRotation(QUARTER_ROTATION, false);
         // At the moment the call returns the drive may still be in QUICK_STOP_ACTIVE;
-        // give it a moment to settle into SWITCH_ON_DISABLED.
-        await resolveAfter(1_000);
-        await expectState('SWITCH_ON_DISABLED');
+        // block until it settles into SWITCH_ON_DISABLED.
+        await waitForCia402State('SWITCH_ON_DISABLED');
         recordMove(stats, `cycle ${i + 1} +`, QUARTER_ROTATION, posBefore, await readPos());
 
         await api.devices.resetFault(device.serialNumber, { force: true });
         posBefore = await readPos();
         await runQuarterRotation(-QUARTER_ROTATION, false);
-        await resolveAfter(1_000);
-        await expectState('SWITCH_ON_DISABLED');
+        await waitForCia402State('SWITCH_ON_DISABLED');
         recordMove(stats, `cycle ${i + 1} -`, -QUARTER_ROTATION, posBefore, await readPos());
       }
       logSummary('skip-quick-stop=false', stats);

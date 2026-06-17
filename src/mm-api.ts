@@ -625,7 +625,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
 /**
  * @title Motion Master API
- * @version 0.0.386
+ * @version 0.0.408
  * @license MIT (https://opensource.org/licenses/MIT)
  * @baseUrl http://{hostname}:{port}/api
  * @contact <msankovic@synapticon.com>
@@ -670,7 +670,7 @@ export class HttpClient<SecurityDataType = unknown> {
  * Use this option when Motion Master is running on a separate host. The container runs in bridge network mode and the API is published on port 8080:
  *
  * ```terminal
- * docker run -d --name motion-master-api --publish=8080:63526 synapticon/motion-master-api:v0.0.386
+ * docker run -d --name motion-master-api --publish=8080:63526 synapticon/motion-master-api:v0.0.408
  * ```
  *
  * Specify the Motion Master host IP when connecting:
@@ -1216,7 +1216,8 @@ export class Api<
         /** @example true */
         "skip-sii-installation"?: boolean;
         /**
-         * List of files from the firmware package to skip during installation.
+         * List of files from the firmware package to skip writing to the device during installation. When omitted, the ESI file (`SOMANET_CiA_402.xml.zip`) is skipped by default, since it is no longer written to the drive over FoE. Provide this parameter to override the default (for example, pass a list without `SOMANET_CiA_402.xml.zip` to still write the ESI to the device).
+         * @default ["SOMANET_CiA_402.xml.zip"]
          * @example ["SOMANET_CiA_402.xml.zip","stack_image.svg.zip"]
          */
         "skip-files"?: string[];
@@ -1946,6 +1947,77 @@ export class Api<
       }),
 
     /**
+     * @description Monitors the statusword (0x6041) and resolves once the target reached bit is set. Fails with a server error if the target is not reached within request-timeout.
+     *
+     * @tags device
+     * @name WhenTargetReached
+     * @summary Wait until the target reached bit (0x6041) is set.
+     * @request GET:/devices/{deviceRef}/when-target-reached
+     */
+    whenTargetReached: (
+      deviceRef: string,
+      query?: {
+        /**
+         * Interval in milliseconds at which to poll the target reached bit (0x6041). Defaults to 10000 ms.
+         * @example 1000
+         */
+        "monitoring-interval"?: number;
+        /**
+         * The duration (in milliseconds) the client will wait for a response(s) to the previous request before raising a timeout error.
+         * @default 5000
+         * @example 5000
+         */
+        "request-timeout"?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          targetReached?: boolean;
+        },
+        ErrorObject
+      >({
+        path: `/devices/${deviceRef}/when-target-reached`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Monitors the statusword (0x6041) and resolves once the device reaches the specified CiA 402 state. Fails with a server error if the state is not reached within request-timeout.
+     *
+     * @tags device
+     * @name WhenCia402StateReached
+     * @summary Wait until the device reaches the specified CiA 402 state.
+     * @request GET:/devices/{deviceRef}/when-cia402-state-reached/{state}
+     */
+    whenCia402StateReached: (
+      deviceRef: string,
+      state: string,
+      query?: {
+        /**
+         * Interval in milliseconds at which to poll the statusword (0x6041). Defaults to 10000 ms.
+         * @example 10000
+         */
+        "monitoring-interval"?: number;
+        /**
+         * The duration (in milliseconds) the client will wait for a response(s) to the previous request before raising a timeout error.
+         * @default 60000
+         * @example 60000
+         */
+        "request-timeout"?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ErrorObject>({
+        path: `/devices/${deviceRef}/when-cia402-state-reached/${state}`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
      * No description
      *
      * @tags device
@@ -1992,6 +2064,7 @@ export class Api<
         method: "PUT",
         query: query,
         body: data,
+        type: ContentType.Text,
         ...params,
       }),
 
@@ -2291,6 +2364,11 @@ export class Api<
          * @example 5000
          */
         "target-reach-timeout"?: number;
+        /**
+         * Interval in milliseconds at which to poll the target reached bit (0x6041). Only effective when target-reach-timeout is set. Defaults to 1000 ms.
+         * @example 200
+         */
+        "monitoring-interval"?: number;
         /** @example 10 */
         window?: number;
         /** @example 5 */
@@ -2347,6 +2425,11 @@ export class Api<
          * @example 5000
          */
         "target-reach-timeout"?: number;
+        /**
+         * Interval in milliseconds at which to poll the target reached bit (0x6041). Only effective when target-reach-timeout is set. Defaults to 1000 ms.
+         * @example 200
+         */
+        "monitoring-interval"?: number;
         /** @example 10 */
         window?: number;
         /** @example 5 */
@@ -2409,6 +2492,11 @@ export class Api<
          * @example 5000
          */
         "target-reach-timeout"?: number;
+        /**
+         * Interval in milliseconds at which to poll the target reached bit (0x6041). Only effective when target-reach-timeout is set. Defaults to 1000 ms.
+         * @example 200
+         */
+        "monitoring-interval"?: number;
         /**
          * @default 100
          * @example 500
@@ -3174,11 +3262,23 @@ export class Api<
       deviceRef: string,
       query?: {
         /**
-         * Comma-separated list of step names to execute during the Offset Detection procedure.
+         * Comma-separated list of step names to execute during the Offset Detection procedure. If not provided, all steps are executed.
          * @default ""
          * @example "openPhaseDetection,phaseResistanceMeasurement,phaseInductanceMeasurement"
          */
         stepNames?: string;
+        /**
+         * Additional time in milliseconds to wait on top of the brake pull time (0x2004:03) after releasing the brake before proceeding with each diagnostic step that requires an open brake. If the brake does not fully release in time, ensure the brake pull time (0x2004:03) is correctly configured for your hardware.
+         * @default 50
+         * @example 300
+         */
+        brakeReleaseWaitMs?: number;
+        /**
+         * Time in milliseconds to wait after engaging the brake before proceeding with each diagnostic step.
+         * @default 50
+         * @example 300
+         */
+        brakeEngageWaitMs?: number;
       },
       params: RequestParams = {},
     ) =>
