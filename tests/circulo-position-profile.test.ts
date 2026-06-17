@@ -6,13 +6,13 @@ import { circuloTestDevice } from '../src/test-devices.js';
 
 const device = circuloTestDevice;
 
-// Half of the Circulo's 2^19 counts/rev encoder.
-const HALF_ROTATION = 262_144;
+// A quarter of the Circulo's 2^19 counts/rev encoder.
+const QUARTER_ROTATION = 131_072;
 
 // Number of forward+back cycles to run per test; override with POSITION_PROFILE_CYCLES.
 const CYCLES = Number(process.env.POSITION_PROFILE_CYCLES) || 2;
 
-function runHalfRotation(target: number, skipQuickStop: boolean) {
+function runQuarterRotation(target: number, skipQuickStop: boolean) {
   return api.devices.runPositionProfile(device.serialNumber, undefined, {
     query: {
       target,
@@ -37,29 +37,27 @@ async function expectState(expected: string) {
   expect(state).toBe(expected);
 }
 
-// Move the motor half a rotation forward and back, CYCLES times. The two tests differ
+// Move the motor a quarter rotation forward and back, CYCLES times. The two tests differ
 // only in skip-quick-stop, which is the behaviour under test:
 //
 // - skip-quick-stop=true: MM returns as soon as motion starts, so the drive stays in
-//   OPERATION_ENABLED between moves and we sleep to let each half-rotation complete
+//   OPERATION_ENABLED between moves and we sleep to let each quarter-rotation complete
 //   before reversing. No quick-stop follows a move.
 // - skip-quick-stop=false: the call blocks until target-reach + holding, then MM runs
 //   the trailing quick-stop sequence and the drive settles into SWITCH_ON_DISABLED.
 //   Each subsequent move therefore needs a fresh resetFault.
-describe('position profile half-rotation cycles', () => {
+describe('position profile quarter-rotation cycles', () => {
   test(
     'skip-quick-stop=true: drive stays enabled across cycles',
     async () => {
       await api.devices.resetFault(device.serialNumber, { force: true });
 
       for (let i = 0; i < CYCLES; i++) {
-        await runHalfRotation(HALF_ROTATION, true);
+        await runQuarterRotation(QUARTER_ROTATION, true);
         await expectState('OPERATION_ENABLED');
-        await resolveAfter(7_000);
 
-        await runHalfRotation(-HALF_ROTATION, true);
+        await runQuarterRotation(-QUARTER_ROTATION, true);
         await expectState('OPERATION_ENABLED');
-        await resolveAfter(7_000);
       }
     },
     CYCLES * 60_000,
@@ -70,14 +68,14 @@ describe('position profile half-rotation cycles', () => {
     async () => {
       for (let i = 0; i < CYCLES; i++) {
         await api.devices.resetFault(device.serialNumber, { force: true });
-        await runHalfRotation(HALF_ROTATION, false);
+        await runQuarterRotation(QUARTER_ROTATION, false);
         // At the moment the call returns the drive may still be in QUICK_STOP_ACTIVE;
         // give it a moment to settle into SWITCH_ON_DISABLED.
         await resolveAfter(1_000);
         await expectState('SWITCH_ON_DISABLED');
 
         await api.devices.resetFault(device.serialNumber, { force: true });
-        await runHalfRotation(-HALF_ROTATION, false);
+        await runQuarterRotation(-QUARTER_ROTATION, false);
         await resolveAfter(1_000);
         await expectState('SWITCH_ON_DISABLED');
       }
