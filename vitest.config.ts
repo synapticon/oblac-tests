@@ -24,6 +24,7 @@ export default defineConfig({
       'tests/circulo-encoder.test.ts',
       'tests/circulo-profiles.test.ts',
       'tests/circulo-motion.test.ts',
+      'tests/circulo-position-profile.test.ts',
       'tests/circulo-smm.test.ts',
       'tests/circulo-cia402.test.ts',
       'tests/circulo-friction.test.ts',
